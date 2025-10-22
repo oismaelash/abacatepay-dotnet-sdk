@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>AbacatePay</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>AbacatePay Team / Ismael Ash</Authors>
+    <Company>AbacatePay</Company>
+    <Description>.NET SDK for AbacatePay API - A comprehensive payment solution for Brazil</Description>
+    <PackageTags>payment;brazil;pix;boleto;fintech</PackageTags>
+    <RepositoryUrl>https://github.com/abacatepay/dotnet-sdk</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <AssemblyTitle>AbacatePay .NET SDK</AssemblyTitle>
+    <AssemblyDescription>.NET SDK for AbacatePay API</AssemblyDescription>
+    <Copyright>Copyright © AbacatePay 2025</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

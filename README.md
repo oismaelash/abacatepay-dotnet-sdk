@@ -41,6 +41,178 @@ dotnet add package AbacatePay.SDK
 <PackageReference Include="AbacatePay.SDK" Version="1.0.0" />
 ```
 
+## Local Development
+
+### Using the Package Locally
+
+To test the SDK locally during development, you can reference the project directly or use a local package:
+
+#### Option 1: Direct Project Reference
+
+Add a direct reference to the project in your `.csproj`:
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\abacatepay-dotnet-sdk\src\AbacatePay\AbacatePay.csproj" />
+  </ItemGroup>
+</Project>
+```
+
+#### Option 2: Local Package (Recommended)
+
+1. **Generate the package locally:**
+```bash
+cd abacatepay-dotnet-sdk
+dotnet pack --configuration Release --output ./packages
+```
+
+2. **Add local NuGet source:**
+```bash
+dotnet nuget add source ./packages --name "LocalPackages"
+```
+
+3. **Install the local package:**
+```bash
+dotnet add package AbacatePay.SDK --source LocalPackages
+```
+
+#### Option 3: Using NuGet.config
+
+Create a `nuget.config` file in your project root:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageSources>
+    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+    <add key="LocalPackages" value="C:\path\to\abacatepay-dotnet-sdk\packages" />
+  </packageSources>
+</configuration>
+```
+
+### Development and Testing
+
+To facilitate development, you can use the included build script:
+
+```bash
+# Full build with tests
+./build.sh
+
+# Build only
+dotnet build
+
+# Tests only
+dotnet test
+```
+
+### Configuration for Local Testing
+
+To test the SDK locally, you'll need to configure the API credentials:
+
+#### 1. Create .env file (for integration tests)
+
+Create a `.env` file in the `tests/AbacatePay.IntegrationTests/` folder:
+
+```bash
+# Copy the example file
+cp tests/AbacatePay.IntegrationTests/env.example tests/AbacatePay.IntegrationTests/.env
+
+# Edit the .env file with your credentials
+ABACATEPAY_API_KEY=your_api_key_here
+ABACATEPAY_SANDBOX=true
+```
+
+#### 2. Configuration in your test project
+
+```csharp
+// In your test project
+var config = new AbacatePayConfig
+{
+    ApiKey = Environment.GetEnvironmentVariable("ABACATEPAY_API_KEY") ?? "your_api_key",
+    Sandbox = true, // Use sandbox for testing
+    BaseUrl = "https://api.abacatepay.com",
+    TimeoutSeconds = 30
+};
+
+var client = new AbacatePayClient(config);
+```
+
+#### 3. Test project example
+
+```xml
+<!-- In your test project -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\abacatepay-dotnet-sdk\src\AbacatePay\AbacatePay.csproj" />
+  </ItemGroup>
+</Project>
+```
+
+### Troubleshooting - Local Usage
+
+#### Issue: "Package not found" when using local package
+
+**Solution:**
+```bash
+# Check if the local source is configured
+dotnet nuget list source
+
+# If not listed, add it again
+dotnet nuget add source ./packages --name "LocalPackages"
+```
+
+#### Issue: "Version conflict" with local packages
+
+**Solution:**
+```bash
+# Clear NuGet cache
+dotnet nuget locals all --clear
+
+# Reinstall the package
+dotnet remove package AbacatePay.SDK
+dotnet add package AbacatePay.SDK --source LocalPackages
+```
+
+#### Issue: "Build failed" when referencing project directly
+
+**Solution:**
+```bash
+# Make sure the SDK project is built
+cd abacatepay-dotnet-sdk
+dotnet build
+
+# Then reference in your project
+cd ../your-project
+dotnet build
+```
+
+#### Issue: "API Key not found" in tests
+
+**Solution:**
+```bash
+# Check if the .env file exists and has correct credentials
+cat tests/AbacatePay.IntegrationTests/.env
+
+# If it doesn't exist, copy from example
+cp tests/AbacatePay.IntegrationTests/env.example tests/AbacatePay.IntegrationTests/.env
+```
+
 ## Quick Start
 
 ### 1. Initialize the Client

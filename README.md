@@ -289,7 +289,6 @@ var config = new AbacatePayConfig
 {
     ApiKey = "your_bearer_token",
     BaseUrl = "https://api.abacatepay.com", // Production URL
-    // BaseUrl = "https://sandbox.abacatepay.com", // Sandbox URL
     TimeoutSeconds = 30,
     Sandbox = false
 };

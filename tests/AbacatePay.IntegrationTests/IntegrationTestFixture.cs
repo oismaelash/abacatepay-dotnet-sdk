@@ -30,7 +30,7 @@ public class IntegrationTestFixture : IDisposable
         Sandbox = sandboxValue == "true" || sandboxValue == "1";
 
         BaseUrl = Environment.GetEnvironmentVariable("ABACATEPAY_BASE_URL") 
-                  ?? (Sandbox ? "https://sandbox.abacatepay.com" : "https://api.abacatepay.com");
+                  ?? "https://api.abacatepay.com";
 
         // Create client with configuration
         var config = new AbacatePayConfig

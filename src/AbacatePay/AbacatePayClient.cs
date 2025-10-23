@@ -46,7 +46,7 @@ public class AbacatePayClient : IDisposable
         {
             ApiKey = apiKey,
             Sandbox = sandbox,
-            BaseUrl = sandbox ? "https://sandbox.abacatepay.com" : "https://api.abacatepay.com"
+            BaseUrl = "https://api.abacatepay.com"
         };
 
         ValidateConfig(config);

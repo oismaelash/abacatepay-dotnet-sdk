@@ -26,8 +26,6 @@ class Program
             // Example 1: Create a PIX payment
             await CreatePixPaymentExample(client);
 
-            // Example 2: Create a Boleto payment
-            await CreateBoletoPaymentExample(client);
 
             // Example 3: List payments
             await ListPaymentsExample(client);
@@ -109,53 +107,6 @@ class Program
         Console.WriteLine($"Copy & Paste Code: {payment.PaymentData?.Pix?.CopyPasteCode}");
     }
 
-    static async Task CreateBoletoPaymentExample(AbacatePayClient client)
-    {
-        Console.WriteLine("\n2. Creating Boleto Payment...");
-
-        var boletoRequest = new PaymentRequest
-        {
-            Amount = 25000, // R$ 250.00
-            Currency = "BRL",
-            Description = "Example Boleto Payment",
-            PaymentMethod = PaymentMethod.BOLETO,
-            Customer = new CustomerInfo
-            {
-                Name = "Maria Santos",
-                Email = "maria@example.com",
-                Document = "98765432100",
-                Address = new AddressInfo
-                {
-                    Street = "Rua das Flores",
-                    Number = "123",
-                    Neighborhood = "Centro",
-                    City = "São Paulo",
-                    State = "SP",
-                    ZipCode = "01234567"
-                }
-            },
-            PaymentOptions = new PaymentOptions
-            {
-                Boleto = new BoletoOptions
-                {
-                    ExpiresAt = DateTime.Now.AddDays(3),
-                    Instructions = "Pay until the expiration date to avoid interest"
-                }
-            },
-            ExpiresIn = 86400 // 24 hours
-        };
-
-        var boletoPayment = await client.CreatePaymentAsync(boletoRequest);
-
-        Console.WriteLine($"Boleto payment created successfully!");
-        Console.WriteLine($"Payment ID: {boletoPayment.Id}");
-        Console.WriteLine($"Status: {boletoPayment.Status}");
-        Console.WriteLine($"Amount: R$ {boletoPayment.Amount / 100.0:F2}");
-        Console.WriteLine($"Boleto Number: {boletoPayment.PaymentData?.Boleto?.BoletoNumber}");
-        Console.WriteLine($"Barcode: {boletoPayment.PaymentData?.Boleto?.Barcode}");
-        Console.WriteLine($"Digitable Line: {boletoPayment.PaymentData?.Boleto?.DigitableLine}");
-        Console.WriteLine($"PDF URL: {boletoPayment.PaymentData?.Boleto?.PdfUrl}");
-    }
 
     static async Task ListPaymentsExample(AbacatePayClient client)
     {

@@ -83,35 +83,6 @@ Console.WriteLine($"Payment ID: {payment.Id}");
 Console.WriteLine($"PIX QR Code: {payment.PaymentData?.Pix?.QrCode}");
 ```
 
-### 3. Create a Boleto Payment
-
-```csharp
-var boletoRequest = new PaymentRequest
-{
-    Amount = 25000, // R$ 250.00 in cents
-    Currency = "BRL",
-    Description = "Boleto Payment",
-    PaymentMethod = PaymentMethod.BOLETO,
-    PaymentOptions = new PaymentOptions
-    {
-        Boleto = new BoletoOptions
-        {
-            ExpiresAt = DateTime.Now.AddDays(3),
-            Instructions = "Pay until expiration date"
-        }
-    },
-    Customer = new CustomerInfo
-    {
-        Name = "Maria Santos",
-        Email = "maria@example.com",
-        Document = "98765432100"
-    }
-};
-
-var boletoPayment = await client.CreatePaymentAsync(boletoRequest);
-Console.WriteLine($"Boleto Number: {boletoPayment.PaymentData?.Boleto?.BoletoNumber}");
-Console.WriteLine($"Barcode: {boletoPayment.PaymentData?.Boleto?.Barcode}");
-```
 
 
 ### 5. Check Payment Status
@@ -288,23 +259,6 @@ var pixPayment = new PaymentRequest
 };
 ```
 
-### Boleto
-Traditional bank slip payment with customizable expiration dates.
-
-```csharp
-var boletoPayment = new PaymentRequest
-{
-    PaymentMethod = PaymentMethod.BOLETO,
-    PaymentOptions = new PaymentOptions
-    {
-        Boleto = new BoletoOptions
-        {
-            ExpiresAt = DateTime.Now.AddDays(7),
-            Instructions = "Payment instructions here"
-        }
-    }
-};
-```
 
 
 ## Error Handling

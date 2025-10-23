@@ -82,10 +82,6 @@ public enum PaymentMethod
     /// </summary>
     PIX,
 
-    /// <summary>
-    /// Boleto bancário
-    /// </summary>
-    BOLETO,
 
 }
 
@@ -184,11 +180,6 @@ public class PaymentOptions
     [JsonProperty("pix")]
     public PixOptions? Pix { get; set; }
 
-    /// <summary>
-    /// Boleto specific options
-    /// </summary>
-    [JsonProperty("boleto")]
-    public BoletoOptions? Boleto { get; set; }
 
 }
 
@@ -236,21 +227,4 @@ public enum PixKeyType
     RANDOM
 }
 
-/// <summary>
-/// Boleto payment options
-/// </summary>
-public class BoletoOptions
-{
-    /// <summary>
-    /// Boleto expiration date
-    /// </summary>
-    [JsonProperty("expires_at")]
-    public DateTime? ExpiresAt { get; set; }
-
-    /// <summary>
-    /// Boleto instructions
-    /// </summary>
-    [JsonProperty("instructions")]
-    public string? Instructions { get; set; }
-}
 

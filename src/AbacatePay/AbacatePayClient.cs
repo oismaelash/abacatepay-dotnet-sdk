@@ -302,7 +302,7 @@ public class AbacatePayClient : IDisposable
         {
             using var hmac = new System.Security.Cryptography.HMACSHA256(System.Text.Encoding.UTF8.GetBytes(secret));
             var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(payload));
-            var computedSignature = Convert.ToHexString(computedHash).ToLower();
+            var computedSignature = BitConverter.ToString(computedHash).Replace("-", "").ToLower();
             
             return computedSignature == signature.ToLower();
         }

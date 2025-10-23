@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -11,7 +11,7 @@
     <Authors>AbacatePay Team / Ismael Ash</Authors>
     <Company>AbacatePay</Company>
     <Description>.NET SDK for AbacatePay API - A comprehensive payment solution for Brazil</Description>
-    <PackageTags>payment;brazil;pix;boleto;fintech</PackageTags>
+    <PackageTags>payment;brazil;pix;fintech</PackageTags>
     <RepositoryUrl>https://github.com/abacatepay/dotnet-sdk</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>

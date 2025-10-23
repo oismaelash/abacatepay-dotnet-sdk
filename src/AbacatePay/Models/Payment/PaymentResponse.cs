@@ -132,11 +132,6 @@ public class PaymentData
     [JsonProperty("pix")]
     public PixData? Pix { get; set; }
 
-    /// <summary>
-    /// Boleto specific data
-    /// </summary>
-    [JsonProperty("boleto")]
-    public BoletoData? Boleto { get; set; }
 
 }
 
@@ -176,63 +171,4 @@ public class PixData
     public PixKeyType? PixKeyType { get; set; }
 }
 
-/// <summary>
-/// Boleto payment data
-/// </summary>
-public class BoletoData
-{
-    /// <summary>
-    /// Boleto number
-    /// </summary>
-    [JsonProperty("boleto_number")]
-    public string? BoletoNumber { get; set; }
-
-    /// <summary>
-    /// Boleto barcode
-    /// </summary>
-    [JsonProperty("barcode")]
-    public string? Barcode { get; set; }
-
-    /// <summary>
-    /// Boleto digitable line
-    /// </summary>
-    [JsonProperty("digitable_line")]
-    public string? DigitableLine { get; set; }
-
-    /// <summary>
-    /// Boleto PDF URL
-    /// </summary>
-    [JsonProperty("pdf_url")]
-    public string? PdfUrl { get; set; }
-
-    /// <summary>
-    /// Boleto expiration date
-    /// </summary>
-    [JsonProperty("expires_at")]
-    public DateTime? ExpiresAt { get; set; }
-
-    /// <summary>
-    /// Bank information
-    /// </summary>
-    [JsonProperty("bank")]
-    public BankInfo? Bank { get; set; }
-}
-
-/// <summary>
-/// Bank information
-/// </summary>
-public class BankInfo
-{
-    /// <summary>
-    /// Bank code
-    /// </summary>
-    [JsonProperty("code")]
-    public string? Code { get; set; }
-
-    /// <summary>
-    /// Bank name
-    /// </summary>
-    [JsonProperty("name")]
-    public string? Name { get; set; }
-}
 

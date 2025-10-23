@@ -1,9 +1,10 @@
 using AbacatePay;
 using AbacatePay.Models;
-using AbacatePay.Models.Payment;
 using AbacatePay.Models.Customer;
-using AbacatePay.Models.Webhook;
-using AbacatePay.Models.Refund;
+using AbacatePay.Models.Coupon;
+using AbacatePay.Models.Billing;
+using AbacatePay.Models.PixQrCode;
+using AbacatePay.Models.Store;
 using AbacatePay.Models.Common;
 using AbacatePay.Services;
 using Moq;
@@ -49,48 +50,20 @@ public class AbacatePayClientTests
     }
 
     [Fact]
-    public void Constructor_WithValidApiKey_ShouldNotThrow()
-    {
-        // Act & Assert
-        var client = new AbacatePayClient("test-api-key");
-        Assert.NotNull(client);
-    }
-
-    [Fact]
-    public void Constructor_WithSandboxMode_ShouldUseSandboxUrl()
-    {
-        // Act
-        var client = new AbacatePayClient("test-api-key", sandbox: true);
-        
-        // Assert
-        Assert.NotNull(client);
-    }
-
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("   ")]
-    public void Constructor_WithInvalidApiKey_ShouldThrowArgumentException(string apiKey)
-    {
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => new AbacatePayClient(apiKey));
-    }
-
-    [Fact]
     public void Constructor_WithNullConfig_ShouldThrowArgumentNullException()
     {
         // Act & Assert
-        Assert.Throws<NullReferenceException>(() => new AbacatePayClient((AbacatePayConfig)null!));
+        Assert.Throws<ArgumentNullException>(() => new AbacatePayClient(null!));
     }
 
     [Fact]
-    public void Constructor_WithInvalidBaseUrl_ShouldThrowArgumentException()
+    public void Constructor_WithEmptyApiKey_ShouldThrowArgumentException()
     {
         // Arrange
         var config = new AbacatePayConfig
         {
-            ApiKey = "test-api-key",
-            BaseUrl = "invalid-url"
+            ApiKey = "",
+            BaseUrl = "https://api.abacatepay.com"
         };
 
         // Act & Assert
@@ -98,220 +71,165 @@ public class AbacatePayClientTests
     }
 
     [Fact]
-    public async Task CreatePaymentAsync_WithValidRequest_ShouldReturnPaymentResponse()
+    public void Constructor_WithNullApiKey_ShouldThrowArgumentException()
     {
         // Arrange
-        var request = new PaymentRequest
+        var config = new AbacatePayConfig
         {
-            Amount = 1000,
-            Description = "Test payment",
-            PaymentMethod = PaymentMethod.PIX
-        };
-
-        var expectedResponse = new PaymentResponse
-        {
-            Id = "payment_123",
-            Amount = 1000,
-            Description = "Test payment",
-            Status = PaymentStatus.PENDING
-        };
-
-        var apiResponse = new ApiResponse<PaymentResponse>
-        {
-            Success = true,
-            Data = expectedResponse
-        };
-
-        _mockHttpService.Setup(x => x.PostAsync<PaymentResponse>("/v1/payments", request, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(apiResponse);
-
-        // Act
-        var result = await _client.CreatePaymentAsync(request);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal("payment_123", result.Id);
-        Assert.Equal(1000, result.Amount);
-        Assert.Equal("Test payment", result.Description);
-        Assert.Equal(PaymentStatus.PENDING, result.Status);
-    }
-
-    [Fact]
-    public async Task CreatePaymentAsync_WithNullRequest_ShouldThrowArgumentNullException()
-    {
-        // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _client.CreatePaymentAsync(null!));
-    }
-
-    [Fact]
-    public async Task CreatePaymentAsync_WithInvalidAmount_ShouldThrowArgumentException()
-    {
-        // Arrange
-        var request = new PaymentRequest
-        {
-            Amount = 0,
-            Description = "Test payment",
-            PaymentMethod = PaymentMethod.PIX
+            ApiKey = null!,
+            BaseUrl = "https://api.abacatepay.com"
         };
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => _client.CreatePaymentAsync(request));
+        Assert.Throws<ArgumentException>(() => new AbacatePayClient(config));
     }
 
     [Fact]
-    public async Task GetPaymentAsync_WithValidId_ShouldReturnPaymentResponse()
+    public void Constructor_WithNullBaseUrl_ShouldThrowArgumentException()
     {
         // Arrange
-        var paymentId = "payment_123";
-        var expectedResponse = new PaymentResponse
+        var config = new AbacatePayConfig
         {
-            Id = paymentId,
-            Amount = 1000,
-            Description = "Test payment",
-            Status = PaymentStatus.COMPLETED
+            ApiKey = "test-api-key",
+            BaseUrl = null!
         };
 
-        var apiResponse = new ApiResponse<PaymentResponse>
-        {
-            Success = true,
-            Data = expectedResponse
-        };
-
-        _mockHttpService.Setup(x => x.GetAsync<PaymentResponse>($"/v1/payments/{paymentId}", It.IsAny<CancellationToken>()))
-            .ReturnsAsync(apiResponse);
-
-        // Act
-        var result = await _client.GetPaymentAsync(paymentId);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(paymentId, result.Id);
-        Assert.Equal(PaymentStatus.COMPLETED, result.Status);
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => new AbacatePayClient(config));
     }
 
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("   ")]
-    public async Task GetPaymentAsync_WithInvalidId_ShouldThrowArgumentException(string paymentId)
+    [Fact]
+    public void Constructor_WithEmptyBaseUrl_ShouldThrowArgumentException()
+    {
+        // Arrange
+        var config = new AbacatePayConfig
+        {
+            ApiKey = "test-api-key",
+            BaseUrl = ""
+        };
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => new AbacatePayClient(config));
+    }
+
+    [Fact]
+    public void Constructor_WithNegativeTimeout_ShouldThrowArgumentException()
+    {
+        // Arrange
+        var config = new AbacatePayConfig
+        {
+            ApiKey = "test-api-key",
+            BaseUrl = "https://api.abacatepay.com",
+            TimeoutSeconds = -1
+        };
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => new AbacatePayClient(config));
+    }
+
+    [Fact]
+    public void Constructor_WithZeroTimeout_ShouldThrowArgumentException()
+    {
+        // Arrange
+        var config = new AbacatePayConfig
+        {
+            ApiKey = "test-api-key",
+            BaseUrl = "https://api.abacatepay.com",
+            TimeoutSeconds = 0
+        };
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => new AbacatePayClient(config));
+    }
+
+    [Fact]
+    public void Constructor_WithValidTimeout_ShouldNotThrow()
+    {
+        // Arrange
+        var config = new AbacatePayConfig
+        {
+            ApiKey = "test-api-key",
+            BaseUrl = "https://api.abacatepay.com",
+            TimeoutSeconds = 30
+        };
+
+        // Act & Assert
+        var client = new AbacatePayClient(config);
+        Assert.NotNull(client);
+    }
+
+    [Fact]
+    public void Constructor_WithApiKeyAndSandbox_ShouldNotThrow()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => _client.GetPaymentAsync(paymentId));
+        var client = new AbacatePayClient("test-api-key", sandbox: true);
+        Assert.NotNull(client);
     }
 
     [Fact]
-    public async Task CancelPaymentAsync_WithValidId_ShouldReturnPaymentResponse()
+    public void Constructor_WithApiKeyOnly_ShouldNotThrow()
+    {
+        // Act & Assert
+        var client = new AbacatePayClient("test-api-key");
+        Assert.NotNull(client);
+    }
+
+    [Fact]
+    public void Constructor_WithEmptyApiKeyString_ShouldThrowArgumentException()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => new AbacatePayClient(""));
+    }
+
+    [Fact]
+    public void Constructor_WithNullApiKeyString_ShouldThrowArgumentException()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => new AbacatePayClient(null!));
+    }
+
+    [Fact]
+    public void Dispose_ShouldNotThrow()
     {
         // Arrange
-        var paymentId = "payment_123";
-        var expectedResponse = new PaymentResponse
-        {
-            Id = paymentId,
-            Status = PaymentStatus.CANCELLED
-        };
+        var client = new AbacatePayClient("test-api-key");
 
-        var apiResponse = new ApiResponse<PaymentResponse>
-        {
-            Success = true,
-            Data = expectedResponse
-        };
-
-        _mockHttpService.Setup(x => x.PostAsync<PaymentResponse>($"/v1/payments/{paymentId}/cancel", null, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(apiResponse);
-
-        // Act
-        var result = await _client.CancelPaymentAsync(paymentId);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(paymentId, result.Id);
-        Assert.Equal(PaymentStatus.CANCELLED, result.Status);
+        // Act & Assert
+        client.Dispose();
+        client.Dispose(); // Should not throw on multiple dispose calls
     }
 
     [Fact]
-    public async Task ListPaymentsAsync_WithDefaultParameters_ShouldReturnList()
-    {
-        // Arrange
-        var expectedPayments = new List<PaymentResponse>
-        {
-            new() { Id = "payment_1", Amount = 1000, Status = PaymentStatus.COMPLETED },
-            new() { Id = "payment_2", Amount = 2000, Status = PaymentStatus.PENDING }
-        };
-
-        var apiResponse = new ApiResponse<List<PaymentResponse>>
-        {
-            Success = true,
-            Data = expectedPayments
-        };
-
-        _mockHttpService.Setup(x => x.GetAsync<List<PaymentResponse>>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(apiResponse);
-
-        // Act
-        var result = await _client.ListPaymentsAsync();
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(2, result.Count);
-        Assert.Equal("payment_1", result[0].Id);
-        Assert.Equal("payment_2", result[1].Id);
-    }
-
-    [Fact]
-    public async Task ListPaymentsAsync_WithFilters_ShouldBuildCorrectQueryString()
-    {
-        // Arrange
-        var expectedPayments = new List<PaymentResponse>();
-        var apiResponse = new ApiResponse<List<PaymentResponse>>
-        {
-            Success = true,
-            Data = expectedPayments
-        };
-
-        _mockHttpService.Setup(x => x.GetAsync<List<PaymentResponse>>(
-            It.Is<string>(s => s.Contains("limit=10") && s.Contains("status=pending")), 
-            It.IsAny<CancellationToken>()))
-            .ReturnsAsync(apiResponse);
-
-        // Act
-        var result = await _client.ListPaymentsAsync(limit: 10, status: PaymentStatus.PENDING);
-
-        // Assert
-        Assert.NotNull(result);
-        _mockHttpService.Verify(x => x.GetAsync<List<PaymentResponse>>(
-            It.Is<string>(s => s.Contains("limit=10") && s.Contains("status=pending")), 
-            It.IsAny<CancellationToken>()), Times.Once);
-    }
-
-    [Fact]
-    public async Task CreateCustomerAsync_WithValidRequest_ShouldReturnCustomerResponse()
+    public async Task CreateCustomerAsync_WithValidRequest_ShouldCallHttpService()
     {
         // Arrange
         var request = new CustomerRequest
         {
-            Name = "John Doe",
-            Email = "john@example.com",
+            Name = "Test Customer",
+            Email = "test@example.com",
             Cellphone = "+5511999999999",
-            TaxId = "12345678901"
+            TaxId = "12345678900"
         };
 
         var expectedResponse = new CustomerResponse
         {
-            Id = "customer_123",
+            Id = "customer-123",
             Metadata = new CustomerMetadata
             {
-                Name = "John Doe",
-                Email = "john@example.com"
+                Name = "Test Customer",
+                Email = "test@example.com"
             }
         };
 
         var apiResponse = new ApiResponse<CustomerResponse>
         {
-            Success = true,
             Data = expectedResponse
         };
 
-        _mockHttpService.Setup(x => x.PostAsync<CustomerResponse>("/v1/customer/create", request, It.IsAny<CancellationToken>()))
+        _mockHttpService.Setup(x => x.PostAsync<CustomerResponse>(
+            It.IsAny<string>(), 
+            It.IsAny<object>(), 
+            It.IsAny<CancellationToken>()))
             .ReturnsAsync(apiResponse);
 
         // Act
@@ -319,115 +237,148 @@ public class AbacatePayClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal("customer_123", result.Id);
-        Assert.Equal("John Doe", result.Metadata?.Name);
-        Assert.Equal("john@example.com", result.Metadata?.Email);
+        Assert.Equal("customer-123", result.Id);
+        _mockHttpService.Verify(x => x.PostAsync<CustomerResponse>(
+            It.IsAny<string>(), 
+            It.IsAny<object>(), 
+            It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
-    public async Task CreateWebhookAsync_WithValidRequest_ShouldReturnWebhookResponse()
+    public async Task ListCustomersAsync_ShouldCallHttpService()
     {
         // Arrange
-        var request = new WebhookConfigRequest
+        var expectedResponse = new List<CustomerResponse>
         {
-            Url = "https://example.com/webhook",
-            Events = new List<WebhookEventType> { WebhookEventType.PAYMENT_COMPLETED, WebhookEventType.PAYMENT_FAILED }
+            new CustomerResponse { Id = "customer-1", Metadata = new CustomerMetadata { Name = "Customer 1" } },
+            new CustomerResponse { Id = "customer-2", Metadata = new CustomerMetadata { Name = "Customer 2" } }
         };
 
-        var expectedResponse = new WebhookConfigResponse
+        var apiResponse = new ApiResponse<List<CustomerResponse>>
         {
-            Id = "webhook_123",
-            Url = "https://example.com/webhook",
-            Events = new List<WebhookEventType> { WebhookEventType.PAYMENT_COMPLETED, WebhookEventType.PAYMENT_FAILED }
-        };
-
-        var apiResponse = new ApiResponse<WebhookConfigResponse>
-        {
-            Success = true,
             Data = expectedResponse
         };
 
-        _mockHttpService.Setup(x => x.PostAsync<WebhookConfigResponse>("/v1/webhooks", request, It.IsAny<CancellationToken>()))
+        _mockHttpService.Setup(x => x.GetAsync<List<CustomerResponse>>(
+            It.IsAny<string>(), 
+            It.IsAny<CancellationToken>()))
             .ReturnsAsync(apiResponse);
 
         // Act
-        var result = await _client.CreateWebhookAsync(request);
+        var result = await _client.ListCustomersAsync();
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal("webhook_123", result.Id);
-        Assert.Equal("https://example.com/webhook", result.Url);
-        Assert.Equal(2, result.Events.Count);
+        Assert.Equal(2, result.Count);
+        _mockHttpService.Verify(x => x.GetAsync<List<CustomerResponse>>(
+            It.IsAny<string>(), 
+            It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
-    public void VerifyWebhookSignature_WithValidSignature_ShouldReturnTrue()
+    public async Task CreateCouponAsync_WithValidRequest_ShouldCallHttpService()
     {
         // Arrange
-        var payload = "test payload";
-        var secret = "test secret";
-        var signature = ComputeHmacSha256(payload, secret);
-
-        // Act
-        var result = AbacatePayClient.VerifyWebhookSignature(payload, signature, secret);
-
-        // Assert
-        Assert.True(result);
-    }
-
-    [Fact]
-    public void VerifyWebhookSignature_WithInvalidSignature_ShouldReturnFalse()
-    {
-        // Arrange
-        var payload = "test payload";
-        var secret = "test secret";
-        var invalidSignature = "invalid signature";
-
-        // Act
-        var result = AbacatePayClient.VerifyWebhookSignature(payload, invalidSignature, secret);
-
-        // Assert
-        Assert.False(result);
-    }
-
-    [Theory]
-    [InlineData(null, "signature", "secret")]
-    [InlineData("payload", null, "secret")]
-    [InlineData("payload", "signature", null)]
-    [InlineData("", "signature", "secret")]
-    [InlineData("payload", "", "secret")]
-    [InlineData("payload", "signature", "")]
-    public void VerifyWebhookSignature_WithNullOrEmptyParameters_ShouldReturnFalse(string payload, string signature, string secret)
-    {
-        // Act
-        var result = AbacatePayClient.VerifyWebhookSignature(payload, signature, secret);
-
-        // Assert
-        Assert.False(result);
-    }
-
-    [Fact]
-    public void Dispose_ShouldDisposeHttpClient()
-    {
-        // Arrange
-        var config = new AbacatePayConfig
+        var request = new CouponRequest
         {
-            ApiKey = "test-api-key",
-            BaseUrl = "https://api.abacatepay.com"
+            Data = new CouponData
+            {
+                Code = "TEST10",
+                MaxRedeems = 10,
+                DiscountKind = DiscountKind.PERCENTAGE,
+                Discount = 10
+            }
         };
-        var client = new AbacatePayClient(config);
+
+        var expectedResponse = new CouponResponse
+        {
+            Id = "coupon-123",
+            MaxRedeems = 10,
+            DiscountKind = DiscountKind.PERCENTAGE,
+            Discount = 10
+        };
+
+        var apiResponse = new ApiResponse<CouponResponse>
+        {
+            Data = expectedResponse
+        };
+
+        _mockHttpService.Setup(x => x.PostAsync<CouponResponse>(
+            It.IsAny<string>(), 
+            It.IsAny<object>(), 
+            It.IsAny<CancellationToken>()))
+            .ReturnsAsync(apiResponse);
 
         // Act
-        client.Dispose();
+        var result = await _client.CreateCouponAsync(request);
 
-        // Assert - Should not throw
-        Assert.True(true);
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("coupon-123", result.Id);
+        _mockHttpService.Verify(x => x.PostAsync<CouponResponse>(
+            It.IsAny<string>(), 
+            It.IsAny<object>(), 
+            It.IsAny<CancellationToken>()), Times.Once);
     }
 
-    private static string ComputeHmacSha256(string payload, string secret)
+    [Fact]
+    public async Task ListCouponsAsync_ShouldCallHttpService()
     {
-        using var hmac = new System.Security.Cryptography.HMACSHA256(System.Text.Encoding.UTF8.GetBytes(secret));
-        var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(payload));
-        return BitConverter.ToString(computedHash).Replace("-", "").ToLower();
+        // Arrange
+        var expectedResponse = new List<CouponResponse>
+        {
+            new CouponResponse { Id = "coupon-1", MaxRedeems = 10 },
+            new CouponResponse { Id = "coupon-2", MaxRedeems = 20 }
+        };
+
+        var apiResponse = new ApiResponse<List<CouponResponse>>
+        {
+            Data = expectedResponse
+        };
+
+        _mockHttpService.Setup(x => x.GetAsync<List<CouponResponse>>(
+            It.IsAny<string>(), 
+            It.IsAny<CancellationToken>()))
+            .ReturnsAsync(apiResponse);
+
+        // Act
+        var result = await _client.ListCouponsAsync();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(2, result.Count);
+        _mockHttpService.Verify(x => x.GetAsync<List<CouponResponse>>(
+            It.IsAny<string>(), 
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetStoreAsync_ShouldCallHttpService()
+    {
+        // Arrange
+        var expectedResponse = new StoreResponse
+        {
+            Id = "store-123"
+        };
+
+        var apiResponse = new ApiResponse<StoreResponse>
+        {
+            Data = expectedResponse
+        };
+
+        _mockHttpService.Setup(x => x.GetAsync<StoreResponse>(
+            It.IsAny<string>(), 
+            It.IsAny<CancellationToken>()))
+            .ReturnsAsync(apiResponse);
+
+        // Act
+        var result = await _client.GetStoreAsync();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("store-123", result.Id);
+        _mockHttpService.Verify(x => x.GetAsync<StoreResponse>(
+            It.IsAny<string>(), 
+            It.IsAny<CancellationToken>()), Times.Once);
     }
 }

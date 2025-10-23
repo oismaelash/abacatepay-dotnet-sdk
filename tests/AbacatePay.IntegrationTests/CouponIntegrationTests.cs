@@ -27,8 +27,11 @@ public class CouponIntegrationTests : IClassFixture<IntegrationTestFixture>
             Data = new CouponData
             {
                 Code = $"TEST{DateTime.UtcNow.Ticks}",
-                Discount = 1000, // R$ 10,00
-                MaxRedeems = 10
+                Notes = "Cupom de teste para integração",
+                MaxRedeems = 10,
+                DiscountKind = DiscountKind.PERCENTAGE,
+                Discount = 20, // 20% de desconto
+                Metadata = new Dictionary<string, object> { { "test", "integration" } }
             }
         };
 
@@ -38,8 +41,11 @@ public class CouponIntegrationTests : IClassFixture<IntegrationTestFixture>
         // Assert
         Assert.NotNull(result);
         Assert.NotEmpty(result.Id);
-        Assert.Equal(1000, result.Discount);
+        Assert.Equal("Cupom de teste para integração", result.Notes);
         Assert.Equal(10, result.MaxRedeems);
+        Assert.Equal(DiscountKind.PERCENTAGE, result.DiscountKind);
+        Assert.Equal(20, result.Discount);
+        Assert.Equal("ACTIVE", result.Status);
         Assert.True(result.CreatedAt > DateTime.UtcNow.AddMinutes(-5));
     }
 
@@ -52,8 +58,11 @@ public class CouponIntegrationTests : IClassFixture<IntegrationTestFixture>
             Data = new CouponData
             {
                 Code = $"UNLIMITED{DateTime.UtcNow.Ticks}",
-                Discount = 500, // R$ 5,00
-                MaxRedeems = -1 // Ilimitado
+                Notes = "Cupom ilimitado para teste",
+                MaxRedeems = -1, // Ilimitado
+                DiscountKind = DiscountKind.FIXED,
+                Discount = 500, // R$ 5,00 de desconto fixo
+                Metadata = new Dictionary<string, object> { { "type", "unlimited" } }
             }
         };
 
@@ -63,8 +72,11 @@ public class CouponIntegrationTests : IClassFixture<IntegrationTestFixture>
         // Assert
         Assert.NotNull(result);
         Assert.NotEmpty(result.Id);
-        Assert.Equal(500, result.Discount);
+        Assert.Equal("Cupom ilimitado para teste", result.Notes);
         Assert.Equal(-1, result.MaxRedeems);
+        Assert.Equal(DiscountKind.FIXED, result.DiscountKind);
+        Assert.Equal(500, result.Discount);
+        Assert.Equal("ACTIVE", result.Status);
         Assert.True(result.CreatedAt > DateTime.UtcNow.AddMinutes(-5));
     }
 
@@ -88,6 +100,8 @@ public class CouponIntegrationTests : IClassFixture<IntegrationTestFixture>
             Data = new CouponData
             {
                 Code = $"INVALID{DateTime.UtcNow.Ticks}",
+                Notes = "Cupom com MaxRedeems inválido",
+                DiscountKind = DiscountKind.PERCENTAGE,
                 Discount = 1000,
                 MaxRedeems = -2 // Valor inválido (deve ser -1 ou >= 0)
             }
@@ -106,6 +120,8 @@ public class CouponIntegrationTests : IClassFixture<IntegrationTestFixture>
             Data = new CouponData
             {
                 // Code não definido
+                Notes = "Cupom sem código",
+                DiscountKind = DiscountKind.PERCENTAGE,
                 Discount = 1000,
                 MaxRedeems = 10
             }

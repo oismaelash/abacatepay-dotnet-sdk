@@ -14,9 +14,18 @@ dotnet restore
 echo "Building solution..."
 dotnet build --configuration Release
 
-# Run tests (if any)
-echo "Running tests..."
-dotnet test --configuration Release --no-build
+# Run unit tests (always)
+echo "Running unit tests..."
+dotnet test tests/AbacatePay.Tests/ --configuration Release --no-build
+
+# Run integration tests (only if API key is provided)
+if [ -f "tests/AbacatePay.IntegrationTests/.env" ] && grep -q "ABACATEPAY_API_KEY=" tests/AbacatePay.IntegrationTests/.env && ! grep -q "ABACATEPAY_API_KEY=your_api_key_here" tests/AbacatePay.IntegrationTests/.env; then
+    echo "Running integration tests..."
+    dotnet test tests/AbacatePay.IntegrationTests/ --configuration Release --no-build
+else
+    echo "Skipping integration tests (no API key configured)"
+    echo "To run integration tests, configure your API key in tests/AbacatePay.IntegrationTests/.env"
+fi
 
 # Pack the NuGet package
 echo "Packing NuGet package..."

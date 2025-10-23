@@ -411,3 +411,5 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+tests/AbacatePay.IntegrationTests/.env

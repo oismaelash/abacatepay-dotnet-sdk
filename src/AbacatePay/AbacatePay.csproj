@@ -6,22 +6,28 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>AbacatePay</PackageId>
+    <PackageId>AbacatePay.SDK</PackageId>
     <Version>1.0.0</Version>
-    <Authors>AbacatePay Team / Ismael Ash</Authors>
-    <Company>AbacatePay</Company>
+    <Authors>Ismael Ash</Authors>
+    <Company>IAXP</Company>
     <Description>.NET SDK for AbacatePay API - A comprehensive payment solution for Brazil</Description>
     <PackageTags>payment;brazil;pix;fintech</PackageTags>
-    <RepositoryUrl>https://github.com/abacatepay/dotnet-sdk</RepositoryUrl>
+    <RepositoryUrl>https://github.com/oismaelash/abacatepay-dotnet-sdk</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <AssemblyTitle>AbacatePay .NET SDK</AssemblyTitle>
     <AssemblyDescription>.NET SDK for AbacatePay API</AssemblyDescription>
     <Copyright>Copyright © AbacatePay 2025</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://docs.abacatepay.com/</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
 

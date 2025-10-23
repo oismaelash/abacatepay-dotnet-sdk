@@ -14,7 +14,6 @@
     <PackageTags>payment;brazil;pix;fintech</PackageTags>
     <RepositoryUrl>https://github.com/abacatepay/dotnet-sdk</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageReadmeFile>../../README.md</PackageReadmeFile>
     <AssemblyTitle>AbacatePay .NET SDK</AssemblyTitle>
     <AssemblyDescription>.NET SDK for AbacatePay API</AssemblyDescription>
     <Copyright>Copyright © AbacatePay 2025</Copyright>
@@ -25,8 +24,5 @@
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="\" />
-  </ItemGroup>
 
 </Project>

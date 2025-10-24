@@ -392,17 +392,27 @@ public class AbacatePayClientTests
         // Arrange
         var request = new WithdrawRequest
         {
+            Description = "Saque para conta principal",
+            ExternalId = "withdraw-1234",
+            Method = "PIX",
             Amount = 5000,
-            PixKey = "test@example.com",
-            Notes = "Test withdraw"
+            Pix = new Pix
+            {
+                Type = "CPF",
+                Key = "123.456.789-01"
+            }
         };
 
         var expectedResponse = new WithdrawResponse
         {
-            Id = "wd_123456",
-            Amount = 5000,
+            Id = "tran_123456",
             Status = "PENDING",
-            PixKey = "test@example.com",
+            DevMode = true,
+            ReceiptUrl = "https://abacatepay.com/receipt/tran_123456",
+            Kind = "WITHDRAW",
+            Amount = 5000,
+            PlatformFee = 80,
+            ExternalId = "withdraw-1234",
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -418,9 +428,12 @@ public class AbacatePayClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal("wd_123456", result.Id);
+        Assert.Equal("tran_123456", result.Id);
         Assert.Equal(5000, result.Amount);
         Assert.Equal("PENDING", result.Status);
+        Assert.True(result.DevMode);
+        Assert.Equal("WITHDRAW", result.Kind);
+        Assert.Equal(80, result.PlatformFee);
         _mockHttpService.Verify(x => x.PostAsync<WithdrawResponse>(
             It.IsAny<string>(), 
             It.IsAny<WithdrawRequest>(), 
@@ -431,13 +444,17 @@ public class AbacatePayClientTests
     public async Task GetWithdrawAsync_ShouldCallHttpService()
     {
         // Arrange
-        var withdrawId = "wd_123456";
+        var withdrawId = "tran_123456";
         var expectedResponse = new WithdrawResponse
         {
             Id = withdrawId,
-            Amount = 5000,
             Status = "PENDING",
-            PixKey = "test@example.com",
+            DevMode = true,
+            ReceiptUrl = "https://abacatepay.com/receipt/tran_123456",
+            Kind = "WITHDRAW",
+            Amount = 5000,
+            PlatformFee = 80,
+            ExternalId = "withdraw-1234",
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -454,6 +471,9 @@ public class AbacatePayClientTests
         Assert.NotNull(result);
         Assert.Equal(withdrawId, result.Id);
         Assert.Equal(5000, result.Amount);
+        Assert.Equal("PENDING", result.Status);
+        Assert.True(result.DevMode);
+        Assert.Equal("WITHDRAW", result.Kind);
         _mockHttpService.Verify(x => x.GetAsync<WithdrawResponse>(
             It.IsAny<string>(), 
             It.IsAny<CancellationToken>()), Times.Once);
@@ -467,10 +487,14 @@ public class AbacatePayClientTests
         {
             new WithdrawResponse
             {
-                Id = "wd_123456",
-                Amount = 5000,
+                Id = "tran_123456",
                 Status = "PENDING",
-                PixKey = "test@example.com",
+                DevMode = true,
+                ReceiptUrl = "https://abacatepay.com/receipt/tran_123456",
+                Kind = "WITHDRAW",
+                Amount = 5000,
+                PlatformFee = 80,
+                ExternalId = "withdraw-1234",
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             }
@@ -487,7 +511,10 @@ public class AbacatePayClientTests
         // Assert
         Assert.NotNull(result);
         Assert.Single(result);
-        Assert.Equal("wd_123456", result[0].Id);
+        Assert.Equal("tran_123456", result[0].Id);
+        Assert.Equal("PENDING", result[0].Status);
+        Assert.True(result[0].DevMode);
+        Assert.Equal("WITHDRAW", result[0].Kind);
         _mockHttpService.Verify(x => x.GetAsync<List<WithdrawResponse>>(
             It.IsAny<string>(), 
             It.IsAny<CancellationToken>()), Times.Once);

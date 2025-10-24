@@ -9,6 +9,27 @@ namespace AbacatePay.Models.Withdraw;
 public class WithdrawRequest
 {
     /// <summary>
+    /// Withdraw description
+    /// </summary>
+    [Required]
+    [JsonProperty("description")]
+    public string Description { get; set; } = string.Empty;
+
+    /// <summary>
+    /// External ID for the withdraw
+    /// </summary>
+    [Required]
+    [JsonProperty("externalId")]
+    public string ExternalId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Withdraw method (PIX)
+    /// </summary>
+    [Required]
+    [JsonProperty("method")]
+    public string Method { get; set; } = string.Empty;
+
+    /// <summary>
     /// Withdraw amount in cents
     /// </summary>
     [Required]
@@ -16,15 +37,9 @@ public class WithdrawRequest
     public int Amount { get; set; }
 
     /// <summary>
-    /// PIX key of the recipient
+    /// PIX information
     /// </summary>
     [Required]
-    [JsonProperty("pixKey")]
-    public string PixKey { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Withdraw notes or description
-    /// </summary>
-    [JsonProperty("notes")]
-    public string? Notes { get; set; }
+    [JsonProperty("pix")]
+    public Pix Pix { get; set; } = new Pix();
 }

@@ -388,6 +388,18 @@ public class AbacatePayClient : IDisposable
 
         if (request.Amount < 100)
             throw new ArgumentException("Amount must be at least 100 cents", nameof(request.Amount));
+
+        if (request.Pix == null)
+            throw new ArgumentException("PIX information is required", nameof(request.Pix));
+
+        if (string.IsNullOrWhiteSpace(request.Pix.Type))
+            throw new ArgumentException("PIX type is required", nameof(request.Pix.Type));
+
+        if (string.IsNullOrWhiteSpace(request.Pix.Key))
+            throw new ArgumentException("PIX key is required", nameof(request.Pix.Key));
+
+        if (request.Method != "PIX")
+            throw new ArgumentException("Method must be 'PIX'", nameof(request.Method));
     }
 
 

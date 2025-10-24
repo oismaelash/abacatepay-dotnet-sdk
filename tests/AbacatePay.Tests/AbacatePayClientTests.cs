@@ -5,6 +5,7 @@ using AbacatePay.Models.Coupon;
 using AbacatePay.Models.Billing;
 using AbacatePay.Models.PixQrCode;
 using AbacatePay.Models.Store;
+using AbacatePay.Models.Withdraw;
 using AbacatePay.Models.Common;
 using AbacatePay.Services;
 using Moq;
@@ -382,4 +383,136 @@ public class AbacatePayClientTests
             It.IsAny<string>(), 
             It.IsAny<CancellationToken>()), Times.Once);
     }
+
+    #region Withdraw Tests
+
+    [Fact]
+    public async Task CreateWithdrawAsync_ShouldCallHttpService()
+    {
+        // Arrange
+        var request = new WithdrawRequest
+        {
+            Amount = 5000,
+            PixKey = "test@example.com",
+            Notes = "Test withdraw"
+        };
+
+        var expectedResponse = new WithdrawResponse
+        {
+            Id = "wd_123456",
+            Amount = 5000,
+            Status = "PENDING",
+            PixKey = "test@example.com",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        _mockHttpService.Setup(x => x.PostAsync<WithdrawResponse>(
+            It.IsAny<string>(), 
+            It.IsAny<WithdrawRequest>(), 
+            It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ApiResponse<WithdrawResponse> { Data = expectedResponse });
+
+        // Act
+        var result = await _client.CreateWithdrawAsync(request);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("wd_123456", result.Id);
+        Assert.Equal(5000, result.Amount);
+        Assert.Equal("PENDING", result.Status);
+        _mockHttpService.Verify(x => x.PostAsync<WithdrawResponse>(
+            It.IsAny<string>(), 
+            It.IsAny<WithdrawRequest>(), 
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetWithdrawAsync_ShouldCallHttpService()
+    {
+        // Arrange
+        var withdrawId = "wd_123456";
+        var expectedResponse = new WithdrawResponse
+        {
+            Id = withdrawId,
+            Amount = 5000,
+            Status = "PENDING",
+            PixKey = "test@example.com",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        _mockHttpService.Setup(x => x.GetAsync<WithdrawResponse>(
+            It.IsAny<string>(), 
+            It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ApiResponse<WithdrawResponse> { Data = expectedResponse });
+
+        // Act
+        var result = await _client.GetWithdrawAsync(withdrawId);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(withdrawId, result.Id);
+        Assert.Equal(5000, result.Amount);
+        _mockHttpService.Verify(x => x.GetAsync<WithdrawResponse>(
+            It.IsAny<string>(), 
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task ListWithdrawsAsync_ShouldCallHttpService()
+    {
+        // Arrange
+        var expectedWithdraws = new List<WithdrawResponse>
+        {
+            new WithdrawResponse
+            {
+                Id = "wd_123456",
+                Amount = 5000,
+                Status = "PENDING",
+                PixKey = "test@example.com",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            }
+        };
+
+        _mockHttpService.Setup(x => x.GetAsync<List<WithdrawResponse>>(
+            It.IsAny<string>(), 
+            It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ApiResponse<List<WithdrawResponse>> { Data = expectedWithdraws });
+
+        // Act
+        var result = await _client.ListWithdrawsAsync();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Single(result);
+        Assert.Equal("wd_123456", result[0].Id);
+        _mockHttpService.Verify(x => x.GetAsync<List<WithdrawResponse>>(
+            It.IsAny<string>(), 
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public void CreateWithdrawAsync_WithNullRequest_ShouldThrowArgumentNullException()
+    {
+        // Act & Assert
+        Assert.ThrowsAsync<ArgumentNullException>(() => _client.CreateWithdrawAsync(null!));
+    }
+
+    [Fact]
+    public void GetWithdrawAsync_WithEmptyId_ShouldThrowArgumentException()
+    {
+        // Act & Assert
+        Assert.ThrowsAsync<ArgumentException>(() => _client.GetWithdrawAsync(string.Empty));
+    }
+
+    [Fact]
+    public void GetWithdrawAsync_WithNullId_ShouldThrowArgumentException()
+    {
+        // Act & Assert
+        Assert.ThrowsAsync<ArgumentException>(() => _client.GetWithdrawAsync(null!));
+    }
+
+    #endregion
 }

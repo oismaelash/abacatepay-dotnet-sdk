@@ -5,6 +5,7 @@ using AbacatePay.Models.Coupon;
 using AbacatePay.Models.Billing;
 using AbacatePay.Models.PixQrCode;
 using AbacatePay.Models.Store;
+using AbacatePay.Models.Withdraw;
 using AbacatePay.Services;
 using System.ComponentModel.DataAnnotations;
 
@@ -237,6 +238,50 @@ public class AbacatePayClient : IDisposable
 
     #endregion
 
+    #region Withdraw Methods
+
+    /// <summary>
+    /// Create a new withdraw
+    /// </summary>
+    /// <param name="request">Withdraw request</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Withdraw response</returns>
+    public async Task<WithdrawResponse> CreateWithdrawAsync(WithdrawRequest request, CancellationToken cancellationToken = default)
+    {
+        ValidateWithdrawRequest(request);
+        
+        var response = await _httpService.PostAsync<WithdrawResponse>("/v1/withdraw/create", request, cancellationToken);
+        return response.Data ?? throw new AbacatePayException("Withdraw creation failed - no data returned");
+    }
+
+    /// <summary>
+    /// Get withdraw details by ID
+    /// </summary>
+    /// <param name="withdrawId">Withdraw ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Withdraw response</returns>
+    public async Task<WithdrawResponse> GetWithdrawAsync(string withdrawId, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(withdrawId))
+            throw new ArgumentException("Withdraw ID is required", nameof(withdrawId));
+
+        var response = await _httpService.GetAsync<WithdrawResponse>($"/v1/withdraw/get?id={withdrawId}", cancellationToken);
+        return response.Data ?? throw new AbacatePayException("Withdraw not found");
+    }
+
+    /// <summary>
+    /// List all withdraws
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>List of withdraws</returns>
+    public async Task<List<WithdrawResponse>> ListWithdrawsAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await _httpService.GetAsync<List<WithdrawResponse>>("/v1/withdraw/list", cancellationToken);
+        return response.Data ?? new List<WithdrawResponse>();
+    }
+
+    #endregion
+
     #region Validation Methods
 
 
@@ -321,6 +366,24 @@ public class AbacatePayClient : IDisposable
         {
             var errorMessages = validationResults.Select(r => r.ErrorMessage).Where(m => !string.IsNullOrEmpty(m));
             throw new ArgumentException($"PIX QRCode request validation failed: {string.Join(", ", errorMessages)}");
+        }
+
+        if (request.Amount < 100)
+            throw new ArgumentException("Amount must be at least 100 cents", nameof(request.Amount));
+    }
+
+    private static void ValidateWithdrawRequest(WithdrawRequest request)
+    {
+        if (request == null)
+            throw new ArgumentNullException(nameof(request));
+
+        var validationResults = new List<ValidationResult>();
+        var validationContext = new ValidationContext(request);
+
+        if (!Validator.TryValidateObject(request, validationContext, validationResults, true))
+        {
+            var errorMessages = validationResults.Select(r => r.ErrorMessage).Where(m => !string.IsNullOrEmpty(m));
+            throw new ArgumentException($"Withdraw request validation failed: {string.Join(", ", errorMessages)}");
         }
 
         if (request.Amount < 100)

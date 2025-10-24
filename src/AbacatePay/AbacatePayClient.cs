@@ -226,9 +226,15 @@ public class AbacatePayClient : IDisposable
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Store response</returns>
-    public async Task<StoreResponse> GetStoreAsync(CancellationToken cancellationToken = default)
+    public async Task<StoreData> GetStoreAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _httpService.GetAsync<StoreResponse>("/v1/store/get", cancellationToken);
+        var response = await _httpService.GetAsync<StoreData>("/v1/store/get", cancellationToken);
+        
+        if (response.Error != null)
+        {
+            throw new AbacatePayException("Store not found\n" + response.Error.ToString());
+        }
+
         return response.Data ?? throw new AbacatePayException("Store not found");
     }
 

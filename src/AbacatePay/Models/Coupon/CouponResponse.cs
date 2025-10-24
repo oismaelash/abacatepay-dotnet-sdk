@@ -37,7 +37,7 @@ public class CouponData
     /// Type of discount
     /// </summary>
     [JsonProperty("discountKind")]
-    public DiscountKind DiscountKind { get; set; }
+    public string DiscountKind { get; set; }
 
     /// <summary>
     /// Discount value

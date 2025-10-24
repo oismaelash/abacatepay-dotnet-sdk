@@ -52,8 +52,24 @@ public static class RequestValidator
             throw new ArgumentException($"Coupon request validation failed: {string.Join(", ", errorMessages)}");
         }
 
-        if (request.Data.MaxRedeems < -1)
-            throw new ArgumentException("MaxRedeems must be -1 (unlimited) or greater than 0", nameof(request.Data.MaxRedeems));
+        // Additional business logic validation beyond data annotations
+        if (request.MaxRedeems < -1 || request.MaxRedeems > 100)
+            throw new ArgumentException("MaxRedeems must be between -1 (unlimited) and 100", nameof(request.MaxRedeems));
+
+        if (request.DiscountKind != "PERCENTAGE" && request.DiscountKind != "FIXED")
+            throw new ArgumentException("DiscountKind must be PERCENTAGE or FIXED", nameof(request.DiscountKind));
+
+        if (request.DiscountKind == "PERCENTAGE" && (request.Discount < 0 || request.Discount > 100))
+            throw new ArgumentException("Discount must be between 0 and 100 for PERCENTAGE type", nameof(request.Discount));
+
+        if (request.DiscountKind == "FIXED" && request.Discount < 100)
+            throw new ArgumentException("Discount must be at least 100 cents for FIXED type", nameof(request.Discount));
+
+        if (request.DiscountKind == "PERCENTAGE" && (request.Discount < 1 || request.Discount > 100))
+            throw new ArgumentException("Discount must be between 1 and 100 for PERCENTAGE type", nameof(request.Discount));
+
+        if (request.DiscountKind == "FIXED" && request.Discount < 100)
+            throw new ArgumentException("Discount must be at least 100 cents for FIXED type", nameof(request.Discount));
     }
 
     /// <summary>

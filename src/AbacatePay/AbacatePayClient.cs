@@ -189,11 +189,16 @@ public class AbacatePayClient : IDisposable
     /// <param name="request">PIX QRCode request</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>PIX QRCode response</returns>
-    public async Task<PixQrCodeResponse> CreatePixQrCodeAsync(PixQrCodeRequest request, CancellationToken cancellationToken = default)
+    public async Task<PixQrCodeData> CreatePixQrCodeAsync(PixQrCodeRequest request, CancellationToken cancellationToken = default)
     {
         RequestValidator.ValidatePixQrCodeRequest(request);
         
-        var response = await _httpService.PostAsync<PixQrCodeResponse>("/v1/pixQrCode/create", request, cancellationToken);
+        var response = await _httpService.PostAsync<PixQrCodeData>("/v1/pixQrCode/create", request, cancellationToken);
+        if (response.Error != null)
+        {
+            throw new AbacatePayException("PIX QRCode creation failed\n" + response.Error.ToString());
+        }
+
         return response.Data ?? throw new AbacatePayException("PIX QRCode creation failed - no data returned");
     }
 

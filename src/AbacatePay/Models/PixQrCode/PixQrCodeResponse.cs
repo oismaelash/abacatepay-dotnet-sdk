@@ -1,3 +1,4 @@
+using AbacatePay.Models.Common;
 using Newtonsoft.Json;
 
 namespace AbacatePay.Models.PixQrCode;
@@ -5,7 +6,7 @@ namespace AbacatePay.Models.PixQrCode;
 /// <summary>
 /// PIX QRCode response from API
 /// </summary>
-public class PixQrCodeResponse
+public class PixQrCodeData
 {
     /// <summary>
     /// PIX QRCode ID
@@ -75,9 +76,16 @@ public class PixQrCodeResponse
 }
 
 /// <summary>
+/// PIX QRCode response from API
+/// </summary>
+public class PixQrCodeResponse : ApiResponse<PixQrCodeData>
+{
+}
+
+/// <summary>
 /// PIX QRCode status check response
 /// </summary>
-public class PixQrCodeStatusResponse
+public class PixQrCodeStatusData
 {
     /// <summary>
     /// Payment status
@@ -90,6 +98,13 @@ public class PixQrCodeStatusResponse
     /// </summary>
     [JsonProperty("expiresAt")]
     public DateTime? ExpiresAt { get; set; }
+}
+
+/// <summary>
+/// PIX QRCode status check response
+/// </summary>
+public class PixQrCodeStatusResponse : ApiResponse<PixQrCodeStatusData>
+{
 }
 
 /// <summary>

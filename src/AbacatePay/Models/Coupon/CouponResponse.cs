@@ -1,3 +1,4 @@
+using AbacatePay.Enums;
 using AbacatePay.Models.Common;
 using Newtonsoft.Json;
 

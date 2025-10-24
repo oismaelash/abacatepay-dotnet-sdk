@@ -61,3 +61,20 @@ public class DiscountKindValidationAttribute : ValidationAttribute
         return $"The {name} field must be one of: {string.Join(", ", ValidTypes)}";
     }
 }
+
+public class MaxRedeemsValidationAttribute : ValidationAttribute
+{
+    public override bool IsValid(object? value)
+    {
+        if (value is not int intValue)
+            return false;
+
+        // 0 is not allowed, must be -1 (unlimited), or any value from 1 to 100 inclusively
+        return intValue == -1 || (intValue >= 1 && intValue <= 100);
+    }
+
+    public override string FormatErrorMessage(string name)
+    {
+        return $"The {name} field must be between -1 (unlimited) and from 1 to 100 inclusively";
+    }
+}

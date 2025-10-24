@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using AbacatePay.Attributes;
-using System.ComponentModel;
 using Newtonsoft.Json;
 
 namespace AbacatePay.Models.Coupon;
@@ -28,7 +27,8 @@ public class CouponRequest
     /// Maximum number of times the coupon can be redeemed
     /// </summary>
     [JsonProperty("maxRedeems")]
-    public int MaxRedeems { get; set; } = -1;
+    [MaxRedeemsValidation]
+    public int MaxRedeems { get; set; }
 
     /// <summary>
     /// Type of discount
@@ -49,6 +49,6 @@ public class CouponRequest
     /// Additional coupon metadata (string or object values)
     /// </summary>
     [JsonProperty("metadata")]
-    public Dictionary<string, object?>? Metadata { get; set; }
+    public Dictionary<string, string>? Metadata { get; set; }
 }
 

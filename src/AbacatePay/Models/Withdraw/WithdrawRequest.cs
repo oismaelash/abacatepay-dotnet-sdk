@@ -4,6 +4,27 @@ using Newtonsoft.Json;
 namespace AbacatePay.Models.Withdraw;
 
 /// <summary>
+/// Custom validation attribute for method type
+/// </summary>
+public class MethodValidationAttribute : ValidationAttribute
+{
+    private static readonly string[] ValidTypes = { "PIX" };
+
+    public override bool IsValid(object? value)
+    {
+        if (value is not string stringValue)
+            return false;
+
+        return ValidTypes.Contains(stringValue.ToUpper());
+    }
+
+    public override string FormatErrorMessage(string name)
+    {
+        return $"The {name} field must be one of: {string.Join(", ", ValidTypes)}";
+    }
+}
+
+/// <summary>
 /// Request to create a withdraw
 /// </summary>
 public class WithdrawRequest
@@ -11,9 +32,8 @@ public class WithdrawRequest
     /// <summary>
     /// Withdraw description
     /// </summary>
-    [Required]
     [JsonProperty("description")]
-    public string Description { get; set; } = string.Empty;
+    public string? Description { get; set; }
 
     /// <summary>
     /// External ID for the withdraw
@@ -27,6 +47,7 @@ public class WithdrawRequest
     /// </summary>
     [Required]
     [JsonProperty("method")]
+    [MethodValidation]
     public string Method { get; set; } = string.Empty;
 
     /// <summary>

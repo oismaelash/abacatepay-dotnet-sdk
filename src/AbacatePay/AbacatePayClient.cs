@@ -249,9 +249,7 @@ public class AbacatePayClient : IDisposable
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Withdraw response</returns>
     public async Task<WithdrawData> CreateWithdrawAsync(WithdrawRequest request, CancellationToken cancellationToken = default)
-    {
-        ValidateWithdrawRequest(request);
-        
+    {   
         var response = await _httpService.PostAsync<WithdrawData>("/v1/withdraw/create", request, cancellationToken);
         
         if (response.Error != null)
@@ -391,36 +389,6 @@ public class AbacatePayClient : IDisposable
         if (request.Amount < 100)
             throw new ArgumentException("Amount must be at least 100 cents", nameof(request.Amount));
     }
-
-    private static void ValidateWithdrawRequest(WithdrawRequest request)
-    {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request));
-
-        var validationResults = new List<ValidationResult>();
-        var validationContext = new ValidationContext(request);
-
-        if (!Validator.TryValidateObject(request, validationContext, validationResults, true))
-        {
-            var errorMessages = validationResults.Select(r => r.ErrorMessage).Where(m => !string.IsNullOrEmpty(m));
-            throw new ArgumentException($"Withdraw request validation failed: {string.Join(", ", errorMessages)}");
-        }
-
-        if (request.Amount >= 300)
-            throw new ArgumentException("Amount must be at least 100 cents", nameof(request.Amount));
-
-        if (request.Pix == null)
-            throw new ArgumentException("PIX information is required", nameof(request.Pix));
-
-        // PIX type validation is handled by the enum - no need for string validation
-
-        if (string.IsNullOrWhiteSpace(request.Pix.Key))
-            throw new ArgumentException("PIX key is required", nameof(request.Pix.Key));
-
-        if (request.Method != "PIX")
-            throw new ArgumentException("Method must be 'PIX'", nameof(request.Method));
-    }
-
 
     #endregion
 

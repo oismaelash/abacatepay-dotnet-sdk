@@ -208,13 +208,19 @@ public class AbacatePayClient : IDisposable
     /// <param name="pixQrCodeId">PIX QRCode ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>PIX QRCode status response</returns>
-    public async Task<PixQrCodeStatusResponse> CheckPixQrCodeStatusAsync(string pixQrCodeId, CancellationToken cancellationToken = default)
+    public async Task<PixQrCodeStatusData> CheckPixQrCodeStatusAsync(string pixQrCodeId, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(pixQrCodeId))
             throw new ArgumentException("PIX QRCode ID is required", nameof(pixQrCodeId));
 
-        var response = await _httpService.GetAsync<PixQrCodeStatusResponse>($"/v1/pixQrCode/check?id={pixQrCodeId}", cancellationToken);
-        return response.Data ?? throw new AbacatePayException("PIX QRCode not found");
+        var response = await _httpService.GetAsync<PixQrCodeStatusData>($"/v1/pixQrCode/check?id={pixQrCodeId}", cancellationToken);
+        
+        if (response.Error != null)
+        {
+            throw new AbacatePayException("PIX QRCode status check failed\n" + response.Error.ToString());
+        }
+        
+        return response.Data ?? throw new AbacatePayException("PIX QRCode status check failed - no data returned");
     }
 
     /// <summary>

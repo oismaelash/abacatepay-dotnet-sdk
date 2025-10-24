@@ -1,5 +1,7 @@
 using AbacatePay.Models.Common;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
+using AbacatePay.Enums;
 
 namespace AbacatePay.Models.PixQrCode;
 
@@ -91,6 +93,7 @@ public class PixQrCodeStatusData
     /// Payment status
     /// </summary>
     [JsonProperty("status")]
+    [EnumDataType(typeof(PixQrCodeStatus))]
     public string Status { get; set; } = string.Empty;
 
     /// <summary>

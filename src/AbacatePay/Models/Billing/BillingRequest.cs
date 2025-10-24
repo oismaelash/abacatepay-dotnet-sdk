@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
+using AbacatePay.Enums;
 
 namespace AbacatePay.Models.Billing;
 
@@ -56,33 +57,6 @@ public class BillingRequest
     public BillingCustomerData? Customer { get; set; }
 }
 
-/// <summary>
-/// Billing frequency enumeration
-/// </summary>
-public enum BillingFrequency
-{
-    /// <summary>
-    /// One-time payment
-    /// </summary>
-    ONE_TIME,
-
-    /// <summary>
-    /// Multiple payments
-    /// </summary>
-    MULTIPLE_PAYMENTS
-}
-
-/// <summary>
-/// Billing payment method enumeration
-/// </summary>
-public enum BillingPaymentMethod
-{
-    /// <summary>
-    /// PIX payment
-    /// </summary>
-    PIX,
-
-}
 
 /// <summary>
 /// Billing product

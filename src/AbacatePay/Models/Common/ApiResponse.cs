@@ -8,51 +8,15 @@ namespace AbacatePay.Models.Common;
 /// <typeparam name="T">Type of the data payload</typeparam>
 public class ApiResponse<T>
 {
-    /// <summary>
-    /// Indicates if the request was successful
+        /// <summary>
+    /// Error information if any
     /// </summary>
-    [JsonProperty("success")]
-    public bool Success { get; set; }
+    [JsonProperty("error")]
+    public object? Error { get; set; }
 
     /// <summary>
-    /// Response message
-    /// </summary>
-    [JsonProperty("message")]
-    public string? Message { get; set; }
-
-    /// <summary>
-    /// Response data
+    /// Response data payload
     /// </summary>
     [JsonProperty("data")]
     public T? Data { get; set; }
-
-    /// <summary>
-    /// Error details if any
-    /// </summary>
-    [JsonProperty("error")]
-    public ErrorDetails? Error { get; set; }
-}
-
-/// <summary>
-/// Error details in API response
-/// </summary>
-public class ErrorDetails
-{
-    /// <summary>
-    /// Error code
-    /// </summary>
-    [JsonProperty("code")]
-    public string? Code { get; set; }
-
-    /// <summary>
-    /// Error message
-    /// </summary>
-    [JsonProperty("message")]
-    public string? Message { get; set; }
-
-    /// <summary>
-    /// Additional error details
-    /// </summary>
-    [JsonProperty("details")]
-    public object? Details { get; set; }
 }

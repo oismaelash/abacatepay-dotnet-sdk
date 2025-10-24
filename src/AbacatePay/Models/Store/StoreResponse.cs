@@ -1,5 +1,5 @@
 using Newtonsoft.Json;
-using AbacatePay.Models;
+using AbacatePay.Models.Common;
 
 namespace AbacatePay.Models.Store;
 
@@ -36,6 +36,6 @@ public class StoreData
 /// <summary>
 /// Store response from API with error and data wrapper
 /// </summary>
-public class StoreResponse : ApiResponseCustom<StoreData>
+public class StoreResponse : ApiResponse<StoreData>
 {
 }

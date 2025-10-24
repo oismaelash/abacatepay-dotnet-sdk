@@ -228,12 +228,8 @@ public class AbacatePayClient : IDisposable
     /// <returns>Store response</returns>
     public async Task<StoreResponse> GetStoreAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _httpService.GetCustomAsync<StoreData>("/v1/store/get", cancellationToken);
-        return new StoreResponse
-        {
-            Data = response.Data,
-            Error = response.Error
-        };
+        var response = await _httpService.GetAsync<StoreResponse>("/v1/store/get", cancellationToken);
+        return response.Data ?? throw new AbacatePayException("Store not found");
     }
 
     #endregion
@@ -246,11 +242,11 @@ public class AbacatePayClient : IDisposable
     /// <param name="request">Withdraw request</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Withdraw response</returns>
-    public async Task<WithdrawResponse> CreateWithdrawAsync(WithdrawRequest request, CancellationToken cancellationToken = default)
+    public async Task<WithdrawData> CreateWithdrawAsync(WithdrawRequest request, CancellationToken cancellationToken = default)
     {
         ValidateWithdrawRequest(request);
         
-        var response = await _httpService.PostAsync<WithdrawResponse>("/v1/withdraw/create", request, cancellationToken);
+        var response = await _httpService.PostAsync<WithdrawData>("/v1/withdraw/create", request, cancellationToken);
         return response.Data ?? throw new AbacatePayException("Withdraw creation failed - no data returned");
     }
 
@@ -260,12 +256,12 @@ public class AbacatePayClient : IDisposable
     /// <param name="withdrawId">Withdraw ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Withdraw response</returns>
-    public async Task<WithdrawResponse> GetWithdrawAsync(string withdrawId, CancellationToken cancellationToken = default)
+    public async Task<WithdrawData> GetWithdrawAsync(string withdrawId, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(withdrawId))
             throw new ArgumentException("Withdraw ID is required", nameof(withdrawId));
 
-        var response = await _httpService.GetAsync<WithdrawResponse>($"/v1/withdraw/get?id={withdrawId}", cancellationToken);
+        var response = await _httpService.GetAsync<WithdrawData>($"/v1/withdraw/get?id={withdrawId}", cancellationToken);
         return response.Data ?? throw new AbacatePayException("Withdraw not found");
     }
 
@@ -274,10 +270,14 @@ public class AbacatePayClient : IDisposable
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of withdraws</returns>
-    public async Task<List<WithdrawResponse>> ListWithdrawsAsync(CancellationToken cancellationToken = default)
+    public async Task< WithdrawResponse> ListWithdrawsAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _httpService.GetAsync<List<WithdrawResponse>>("/v1/withdraw/list", cancellationToken);
-        return response.Data ?? new List<WithdrawResponse>();
+        var response = await _httpService.GetAsync<WithdrawData>("/v1/withdraw/list", cancellationToken);
+        return new WithdrawResponse
+        {
+            Data = response.Data,
+            Error = response.Error
+        };
     }
 
     #endregion

@@ -1,3 +1,4 @@
+using AbacatePay.Models.Common;
 using Newtonsoft.Json;
 
 namespace AbacatePay.Models.Withdraw;
@@ -5,7 +6,7 @@ namespace AbacatePay.Models.Withdraw;
 /// <summary>
 /// Withdraw response from API
 /// </summary>
-public class WithdrawResponse
+public class WithdrawData
 {
     /// <summary>
     /// Withdraw ID
@@ -66,4 +67,8 @@ public class WithdrawResponse
     /// </summary>
     [JsonProperty("updatedAt")]
     public DateTime UpdatedAt { get; set; }
+}
+
+public class WithdrawResponse : ApiResponse<WithdrawData>
+{
 }

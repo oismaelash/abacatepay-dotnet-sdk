@@ -1,28 +1,8 @@
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+using AbacatePay.Attributes;
 
 namespace AbacatePay.Models.Withdraw;
-
-/// <summary>
-/// Custom validation attribute for PIX key type
-/// </summary>
-public class PixKeyTypeValidationAttribute : ValidationAttribute
-{
-    private static readonly string[] ValidTypes = { "CPF", "CNPJ", "EMAIL", "PHONE", "RANDOM", "BR_CODE" };
-
-    public override bool IsValid(object? value)
-    {
-        if (value is not string stringValue)
-            return false;
-
-        return ValidTypes.Contains(stringValue.ToUpper());
-    }
-
-    public override string FormatErrorMessage(string name)
-    {
-        return $"The {name} field must be one of: {string.Join(", ", ValidTypes)}";
-    }
-}
 
 /// <summary>
 /// PIX key types

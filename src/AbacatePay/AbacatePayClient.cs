@@ -273,7 +273,7 @@ public class AbacatePayClient : IDisposable
         if (string.IsNullOrWhiteSpace(withdrawId))
             throw new ArgumentException("Withdraw ID is required", nameof(withdrawId));
 
-        var response = await _httpService.GetAsync<WithdrawData>($"/v1/withdraw/get?id={withdrawId}", cancellationToken);
+        var response = await _httpService.GetAsync<WithdrawData>($"/v1/withdraw/get?externalId={withdrawId}", cancellationToken);
         
         if (response.Error != null)
         {

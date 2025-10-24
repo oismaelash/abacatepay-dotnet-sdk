@@ -230,12 +230,18 @@ public class AbacatePayClient : IDisposable
     /// <param name="request">Simulate payment request</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>PIX QRCode response</returns>
-    public async Task<PixQrCodeResponse> SimulatePixQrCodePaymentAsync(string pixQrCodeId, PixQrCodeSimulateRequest request, CancellationToken cancellationToken = default)
+    public async Task<PixQrCodeData> SimulatePixQrCodePaymentAsync(string pixQrCodeId, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(pixQrCodeId))
             throw new ArgumentException("PIX QRCode ID is required", nameof(pixQrCodeId));
 
-        var response = await _httpService.PostAsync<PixQrCodeResponse>($"/v1/pixQrCode/simulate-payment?id={pixQrCodeId}", request, cancellationToken);
+        var response = await _httpService.PostAsync<PixQrCodeData>($"/v1/pixQrCode/simulate-payment?id={pixQrCodeId}", cancellationToken);
+        
+        if (response.Error != null)
+        {
+            throw new AbacatePayException("PIX QRCode payment simulation failed\n" + response.Error.ToString());
+        }
+        
         return response.Data ?? throw new AbacatePayException("PIX QRCode payment simulation failed - no data returned");
     }
 

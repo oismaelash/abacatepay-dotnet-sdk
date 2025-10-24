@@ -7,7 +7,7 @@ using AbacatePay.Models.PixQrCode;
 using AbacatePay.Models.Store;
 using AbacatePay.Models.Withdraw;
 using AbacatePay.Services;
-using System.ComponentModel.DataAnnotations;
+using AbacatePay.Validators;
 
 namespace AbacatePay;
 
@@ -77,7 +77,7 @@ public class AbacatePayClient : IDisposable
     /// <returns>Customer response</returns>
     public async Task<CustomerResponse> CreateCustomerAsync(CustomerRequest request, CancellationToken cancellationToken = default)
     {
-        ValidateCustomerRequest(request);
+        RequestValidator.ValidateCustomerRequest(request);
         
         var response = await _httpService.PostAsync<CustomerResponse>("/v1/customer/create", request, cancellationToken);
         return response.Data ?? throw new AbacatePayException("Customer creation failed - no data returned");
@@ -106,7 +106,7 @@ public class AbacatePayClient : IDisposable
     /// <returns>Coupon response</returns>
     public async Task<CouponResponse> CreateCouponAsync(CouponRequest request, CancellationToken cancellationToken = default)
     {
-        ValidateCouponRequest(request);
+        RequestValidator.ValidateCouponRequest(request);
         
         var response = await _httpService.PostAsync<CouponResponse>("/v1/coupon/create", request, cancellationToken);
         return response.Data ?? throw new AbacatePayException("Coupon creation failed - no data returned");
@@ -135,7 +135,7 @@ public class AbacatePayClient : IDisposable
     /// <returns>Billing response</returns>
     public async Task<BillingResponse> CreateBillingAsync(BillingRequest request, CancellationToken cancellationToken = default)
     {
-        ValidateBillingRequest(request);
+        RequestValidator.ValidateBillingRequest(request);
         
         var response = await _httpService.PostAsync<BillingResponse>("/v1/billing/create", request, cancellationToken);
         return response.Data ?? throw new AbacatePayException("Billing creation failed - no data returned");
@@ -179,7 +179,7 @@ public class AbacatePayClient : IDisposable
     /// <returns>PIX QRCode response</returns>
     public async Task<PixQrCodeResponse> CreatePixQrCodeAsync(PixQrCodeRequest request, CancellationToken cancellationToken = default)
     {
-        ValidatePixQrCodeRequest(request);
+        RequestValidator.ValidatePixQrCodeRequest(request);
         
         var response = await _httpService.PostAsync<PixQrCodeResponse>("/v1/pixQrCode/create", request, cancellationToken);
         return response.Data ?? throw new AbacatePayException("PIX QRCode creation failed - no data returned");
@@ -300,97 +300,6 @@ public class AbacatePayClient : IDisposable
 
     #endregion
 
-    #region Validation Methods
-
-
-    private static void ValidateCustomerRequest(CustomerRequest request)
-    {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request));
-
-        var validationResults = new List<ValidationResult>();
-        var validationContext = new ValidationContext(request);
-
-        if (!Validator.TryValidateObject(request, validationContext, validationResults, true))
-        {
-            var errorMessages = validationResults.Select(r => r.ErrorMessage).Where(m => !string.IsNullOrEmpty(m));
-            throw new ArgumentException($"Customer request validation failed: {string.Join(", ", errorMessages)}");
-        }
-    }
-
-    private static void ValidateCouponRequest(CouponRequest request)
-    {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request));
-
-        var validationResults = new List<ValidationResult>();
-        var validationContext = new ValidationContext(request);
-
-        if (!Validator.TryValidateObject(request, validationContext, validationResults, true))
-        {
-            var errorMessages = validationResults.Select(r => r.ErrorMessage).Where(m => !string.IsNullOrEmpty(m));
-            throw new ArgumentException($"Coupon request validation failed: {string.Join(", ", errorMessages)}");
-        }
-
-        if (request.Data.MaxRedeems < -1)
-            throw new ArgumentException("MaxRedeems must be -1 (unlimited) or greater than 0", nameof(request.Data.MaxRedeems));
-    }
-
-    private static void ValidateBillingRequest(BillingRequest request)
-    {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request));
-
-        var validationResults = new List<ValidationResult>();
-        var validationContext = new ValidationContext(request);
-
-        if (!Validator.TryValidateObject(request, validationContext, validationResults, true))
-        {
-            var errorMessages = validationResults.Select(r => r.ErrorMessage).Where(m => !string.IsNullOrEmpty(m));
-            throw new ArgumentException($"Billing request validation failed: {string.Join(", ", errorMessages)}");
-        }
-
-        if (!Uri.TryCreate(request.ReturnUrl, UriKind.Absolute, out _))
-            throw new ArgumentException("Invalid return URL format", nameof(request.ReturnUrl));
-
-        if (!Uri.TryCreate(request.CompletionUrl, UriKind.Absolute, out _))
-            throw new ArgumentException("Invalid completion URL format", nameof(request.CompletionUrl));
-
-        if (request.Products == null || !request.Products.Any())
-            throw new ArgumentException("At least one product is required", nameof(request.Products));
-
-        foreach (var product in request.Products)
-        {
-            if (product.Quantity < 1)
-                throw new ArgumentException("Product quantity must be at least 1", nameof(product.Quantity));
-
-            if (product.Price < 100)
-                throw new ArgumentException("Product price must be at least 100 cents", nameof(product.Price));
-        }
-
-        if (string.IsNullOrWhiteSpace(request.CustomerId) && request.Customer == null)
-            throw new ArgumentException("Either CustomerId or Customer data must be provided");
-    }
-
-    private static void ValidatePixQrCodeRequest(PixQrCodeRequest request)
-    {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request));
-
-        var validationResults = new List<ValidationResult>();
-        var validationContext = new ValidationContext(request);
-
-        if (!Validator.TryValidateObject(request, validationContext, validationResults, true))
-        {
-            var errorMessages = validationResults.Select(r => r.ErrorMessage).Where(m => !string.IsNullOrEmpty(m));
-            throw new ArgumentException($"PIX QRCode request validation failed: {string.Join(", ", errorMessages)}");
-        }
-
-        if (request.Amount < 100)
-            throw new ArgumentException("Amount must be at least 100 cents", nameof(request.Amount));
-    }
-
-    #endregion
 
     #region IDisposable
 

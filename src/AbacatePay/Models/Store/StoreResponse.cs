@@ -1,11 +1,12 @@
 using Newtonsoft.Json;
+using AbacatePay.Models;
 
 namespace AbacatePay.Models.Store;
 
 /// <summary>
-/// Store response from API
+/// Store data from API
 /// </summary>
-public class StoreResponse
+public class StoreData
 {
     /// <summary>
     /// Store ID
@@ -24,4 +25,17 @@ public class StoreResponse
     /// </summary>
     [JsonProperty("createdAt")]
     public DateTime CreatedAt { get; set; }
+
+    /// <summary>
+    /// Store balance information
+    /// </summary>
+    [JsonProperty("balance")]
+    public Balance Balance { get; set; } = new Balance();
+}
+
+/// <summary>
+/// Store response from API with error and data wrapper
+/// </summary>
+public class StoreResponse : ApiResponse<StoreData>
+{
 }

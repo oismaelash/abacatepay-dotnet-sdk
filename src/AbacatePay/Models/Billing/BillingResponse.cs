@@ -1,3 +1,4 @@
+using AbacatePay.Models.Common;
 using Newtonsoft.Json;
 
 namespace AbacatePay.Models.Billing;
@@ -5,7 +6,7 @@ namespace AbacatePay.Models.Billing;
 /// <summary>
 /// Billing response from API
 /// </summary>
-public class BillingResponse
+public class BillingData
 {
     /// <summary>
     /// Billing ID
@@ -47,7 +48,7 @@ public class BillingResponse
     /// Products included in the billing
     /// </summary>
     [JsonProperty("products")]
-    public List<BillingProductResponse> Products { get; set; } = new();
+    public List<BillingProductData> Products { get; set; } = new();
 
     /// <summary>
     /// Billing frequency
@@ -56,16 +57,10 @@ public class BillingResponse
     public string Frequency { get; set; } = string.Empty;
 
     /// <summary>
-    /// Next billing information
-    /// </summary>
-    [JsonProperty("nextBilling")]
-    public object? NextBilling { get; set; }
-
-    /// <summary>
     /// Customer information
     /// </summary>
     [JsonProperty("customer")]
-    public BillingCustomerResponse? Customer { get; set; }
+    public BillingCustomer? Customer { get; set; }
 
     /// <summary>
     /// Billing creation timestamp
@@ -78,12 +73,43 @@ public class BillingResponse
     /// </summary>
     [JsonProperty("updatedAt")]
     public DateTime UpdatedAt { get; set; }
+
+    /// <summary>
+    /// Billing metadata including fee and URLs
+    /// </summary>
+    [JsonProperty("metadata")]
+    public BillingMetadata? Metadata { get; set; }
+
+    /// <summary>
+    /// Whether coupons are allowed for this billing
+    /// </summary>
+    [JsonProperty("allowCoupons")]
+    public bool AllowCoupons { get; set; }
+
+    /// <summary>
+    /// Available coupons for this billing
+    /// </summary>
+    [JsonProperty("coupons")]
+    public List<string> Coupons { get; set; } = new();
+
+    /// <summary>
+    /// Coupons that have been used for this billing
+    /// </summary>
+    [JsonProperty("couponsUsed")]
+    public List<string> CouponsUsed { get; set; } = new();
+}
+
+/// <summary>
+/// Billing response from API
+/// </summary>
+public class BillingResponse : ApiResponse<BillingData>
+{
 }
 
 /// <summary>
 /// Billing product response
 /// </summary>
-public class BillingProductResponse
+public class BillingProductData
 {
     /// <summary>
     /// Product ID
@@ -105,9 +131,16 @@ public class BillingProductResponse
 }
 
 /// <summary>
-/// Billing customer response
+/// Billing product response from API
 /// </summary>
-public class BillingCustomerResponse
+public class BillingProductResponse : ApiResponse<BillingProductData>
+{
+}
+
+/// <summary>
+/// Billing customer data
+/// </summary>
+public class BillingCustomerResponseData
 {
     /// <summary>
     /// Customer ID
@@ -120,6 +153,13 @@ public class BillingCustomerResponse
     /// </summary>
     [JsonProperty("metadata")]
     public BillingCustomerMetadata? Metadata { get; set; }
+}
+
+/// <summary>
+/// Billing customer response from API
+/// </summary>
+public class BillingCustomerResponse : ApiResponse<BillingCustomerResponseData>
+{
 }
 
 /// <summary>
@@ -150,4 +190,52 @@ public class BillingCustomerMetadata
     /// </summary>
     [JsonProperty("taxId")]
     public string? TaxId { get; set; }
+
+    /// <summary>
+    /// Customer zip code
+    /// </summary>
+    [JsonProperty("zipCode")]
+    public string? ZipCode { get; set; }
+}
+
+/// <summary>
+/// Billing metadata
+/// </summary>
+public class BillingMetadata
+{
+    /// <summary>
+    /// Platform fee in cents
+    /// </summary>
+    [JsonProperty("fee")]
+    public int Fee { get; set; }
+
+    /// <summary>
+    /// Return URL after payment
+    /// </summary>
+    [JsonProperty("returnUrl")]
+    public string? ReturnUrl { get; set; }
+
+    /// <summary>
+    /// Completion URL after payment
+    /// </summary>
+    [JsonProperty("completionUrl")]
+    public string? CompletionUrl { get; set; }
+}
+
+/// <summary>
+/// Billing customer
+/// </summary>
+public class BillingCustomer
+{
+    /// <summary>
+    /// Customer ID
+    /// </summary>
+    [JsonProperty("id")]
+    public string Id { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Customer metadata
+    /// </summary>
+    [JsonProperty("metadata")]
+    public Dictionary<string, string>? Metadata { get; set; }
 }

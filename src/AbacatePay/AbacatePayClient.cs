@@ -145,12 +145,17 @@ public class AbacatePayClient : IDisposable
     /// <param name="request">Billing request</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Billing response</returns>
-    public async Task<BillingResponse> CreateBillingAsync(BillingRequest request, CancellationToken cancellationToken = default)
+    public async Task<BillingData> CreateBillingAsync(BillingRequest request, CancellationToken cancellationToken = default)
     {
         RequestValidator.ValidateBillingRequest(request);
         
-        var response = await _httpService.PostAsync<BillingResponse>("/v1/billing/create", request, cancellationToken);
-        return response.Data ?? throw new AbacatePayException("Billing creation failed - no data returned");
+        var response = await _httpService.PostAsync<BillingData>("/v1/billing/create", request, cancellationToken);
+        if (response.Error != null)
+        {
+            throw new AbacatePayException("Billing creation failed\n" + response.Error.ToString());
+        }
+
+        return response.Data ?? throw new AbacatePayException("Billing creation failed");
     }
 
     /// <summary>
@@ -159,13 +164,18 @@ public class AbacatePayClient : IDisposable
     /// <param name="billingId">Billing ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Billing response</returns>
-    public async Task<BillingResponse> GetBillingAsync(string billingId, CancellationToken cancellationToken = default)
+    public async Task<BillingData> GetBillingAsync(string billingId, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(billingId))
             throw new ArgumentException("Billing ID is required", nameof(billingId));
 
-        var response = await _httpService.GetAsync<BillingResponse>($"/v1/billing/get?id={billingId}", cancellationToken);
-        return response.Data ?? throw new AbacatePayException("Billing not found");
+        var response = await _httpService.GetAsync<BillingData>($"/v1/billing/get?id={billingId}", cancellationToken);
+        if (response.Error != null)
+        {
+            throw new AbacatePayException("Billing not found\n" + response.Error.ToString());
+        }
+
+        return response.Data ?? throw new AbacatePayException("Billing not found - no data returned");
     }
 
     /// <summary>
@@ -173,10 +183,15 @@ public class AbacatePayClient : IDisposable
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of billings</returns>
-    public async Task<List<BillingResponse>> ListBillingsAsync(CancellationToken cancellationToken = default)
+    public async Task<List<BillingData>> ListBillingsAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _httpService.GetAsync<List<BillingResponse>>("/v1/billing/list", cancellationToken);
-        return response.Data ?? new List<BillingResponse>();
+        var response = await _httpService.GetAsync<List<BillingData>>("/v1/billing/list", cancellationToken);
+        if (response.Error != null)
+        {
+            throw new AbacatePayException("Billing list failed\n" + response.Error.ToString());
+        }
+
+        return response.Data ?? new List<BillingData>();
     }
 
     #endregion

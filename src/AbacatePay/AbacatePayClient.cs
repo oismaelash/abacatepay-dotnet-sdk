@@ -104,11 +104,17 @@ public class AbacatePayClient : IDisposable
     /// <param name="request">Coupon request</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Coupon response</returns>
-    public async Task<CouponResponse> CreateCouponAsync(CouponRequest request, CancellationToken cancellationToken = default)
+    public async Task<CouponData> CreateCouponAsync(CouponRequest request, CancellationToken cancellationToken = default)
     {
         RequestValidator.ValidateCouponRequest(request);
         
-        var response = await _httpService.PostAsync<CouponResponse>("/v1/coupon/create", request, cancellationToken);
+        var response = await _httpService.PostAsync<CouponData>("/v1/coupon/create", request, cancellationToken);
+
+        if (response.Error != null)
+        {
+            throw new AbacatePayException("Coupon creation failed\n" + response.Error.ToString());
+        }
+
         return response.Data ?? throw new AbacatePayException("Coupon creation failed - no data returned");
     }
 

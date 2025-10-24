@@ -1,11 +1,12 @@
+using AbacatePay.Models.Common;
 using Newtonsoft.Json;
 
 namespace AbacatePay.Models.Coupon;
 
 /// <summary>
-/// Coupon response from API
+/// Coupon data from API
 /// </summary>
-public class CouponResponse
+public class CouponData
 {
     /// <summary>
     /// Coupon ID
@@ -72,4 +73,11 @@ public class CouponResponse
     /// </summary>
     [JsonProperty("metadata")]
     public Dictionary<string, object>? Metadata { get; set; }
+}
+
+/// <summary>
+/// Coupon response from API
+/// </summary>
+public class CouponResponse : ApiResponse<CouponData>
+{
 }

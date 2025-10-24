@@ -13,13 +13,13 @@ public class CouponRequest
     /// </summary>
     [Required]
     [JsonProperty("data")]
-    public CouponData Data { get; set; } = new();
+    public Data Data { get; set; } = new();
 }
 
 /// <summary>
 /// Coupon data
 /// </summary>
-public class CouponData
+public class Data
 {
     /// <summary>
     /// Unique coupon identifier

@@ -117,10 +117,16 @@ public class AbacatePayClient : IDisposable
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of coupons</returns>
-    public async Task<List<CouponResponse>> ListCouponsAsync(CancellationToken cancellationToken = default)
+    public async Task<List<CouponData>> ListCouponsAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _httpService.GetAsync<List<CouponResponse>>("/v1/coupon/list", cancellationToken);
-        return response.Data ?? new List<CouponResponse>();
+        var response = await _httpService.GetAsync<List<CouponData>>("/v1/coupon/list", cancellationToken);
+        
+        if (response.Error != null)
+        {
+            throw new AbacatePayException("Coupon list failed\n" + response.Error.ToString());
+        }
+
+        return response.Data ?? throw new AbacatePayException("Coupon list failed - no data returned");
     }
 
     #endregion
@@ -218,7 +224,6 @@ public class AbacatePayClient : IDisposable
 
     #endregion
 
-
     #region Store Methods
 
     /// <summary>
@@ -299,7 +304,6 @@ public class AbacatePayClient : IDisposable
     }
 
     #endregion
-
 
     #region IDisposable
 

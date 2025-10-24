@@ -38,7 +38,7 @@ public class PixQrCodeRequest
     /// Additional metadata
     /// </summary>
     [JsonProperty("metadata")]
-    public Dictionary<string, object>? Metadata { get; set; }
+    public Dictionary<string, string>? Metadata { get; set; }
 }
 
 /// <summary>

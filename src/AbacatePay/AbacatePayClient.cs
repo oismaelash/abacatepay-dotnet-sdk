@@ -253,6 +253,12 @@ public class AbacatePayClient : IDisposable
         ValidateWithdrawRequest(request);
         
         var response = await _httpService.PostAsync<WithdrawData>("/v1/withdraw/create", request, cancellationToken);
+        
+        if (response.Error != null)
+        {
+            throw new AbacatePayException("Withdraw creation failed\n" + response.Error.ToString());
+        }
+
         return response.Data ?? throw new AbacatePayException("Withdraw creation failed - no data returned");
     }
 
@@ -268,6 +274,12 @@ public class AbacatePayClient : IDisposable
             throw new ArgumentException("Withdraw ID is required", nameof(withdrawId));
 
         var response = await _httpService.GetAsync<WithdrawData>($"/v1/withdraw/get?id={withdrawId}", cancellationToken);
+        
+        if (response.Error != null)
+        {
+            throw new AbacatePayException("Withdraw not found\n" + response.Error.ToString());
+        }
+        
         return response.Data ?? throw new AbacatePayException("Withdraw not found");
     }
 
@@ -276,14 +288,16 @@ public class AbacatePayClient : IDisposable
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of withdraws</returns>
-    public async Task< WithdrawResponse> ListWithdrawsAsync(CancellationToken cancellationToken = default)
+    public async Task<WithdrawData> ListWithdrawsAsync(CancellationToken cancellationToken = default)
     {
         var response = await _httpService.GetAsync<WithdrawData>("/v1/withdraw/list", cancellationToken);
-        return new WithdrawResponse
+        
+        if (response.Error != null)
         {
-            Data = response.Data,
-            Error = response.Error
-        };
+            throw new AbacatePayException("Withdraw list failed\n" + response.Error.ToString());
+        }
+
+        return response.Data ?? throw new AbacatePayException("Withdraw list failed - no data returned");
     }
 
     #endregion
@@ -392,14 +406,13 @@ public class AbacatePayClient : IDisposable
             throw new ArgumentException($"Withdraw request validation failed: {string.Join(", ", errorMessages)}");
         }
 
-        if (request.Amount < 100)
+        if (request.Amount >= 300)
             throw new ArgumentException("Amount must be at least 100 cents", nameof(request.Amount));
 
         if (request.Pix == null)
             throw new ArgumentException("PIX information is required", nameof(request.Pix));
 
-        if (string.IsNullOrWhiteSpace(request.Pix.Type))
-            throw new ArgumentException("PIX type is required", nameof(request.Pix.Type));
+        // PIX type validation is handled by the enum - no need for string validation
 
         if (string.IsNullOrWhiteSpace(request.Pix.Key))
             throw new ArgumentException("PIX key is required", nameof(request.Pix.Key));

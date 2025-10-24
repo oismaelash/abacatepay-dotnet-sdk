@@ -227,8 +227,12 @@ public class AbacatePayClient : IDisposable
     /// <returns>Store response</returns>
     public async Task<StoreResponse> GetStoreAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _httpService.GetAsync<StoreResponse>("/v1/store/get", cancellationToken);
-        return response.Data ?? throw new AbacatePayException("Store not found");
+        var response = await _httpService.GetCustomAsync<StoreData>("/v1/store/get", cancellationToken);
+        return new StoreResponse
+        {
+            Data = response.Data,
+            Error = response.Error
+        };
     }
 
     #endregion

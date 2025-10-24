@@ -36,6 +36,6 @@ public class StoreData
 /// <summary>
 /// Store response from API with error and data wrapper
 /// </summary>
-public class StoreResponse : ApiResponse<StoreData>
+public class StoreResponse : ApiResponseCustom<StoreData>
 {
 }

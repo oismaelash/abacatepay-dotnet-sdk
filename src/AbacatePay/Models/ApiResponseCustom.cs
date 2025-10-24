@@ -6,7 +6,7 @@ namespace AbacatePay.Models;
 /// Generic API response wrapper
 /// </summary>
 /// <typeparam name="T">Type of the data payload</typeparam>
-public class ApiResponse<T>
+public class ApiResponseCustom<T>
 {
     /// <summary>
     /// Error information if any

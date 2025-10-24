@@ -356,28 +356,29 @@ public class AbacatePayClientTests
     public async Task GetStoreAsync_ShouldCallHttpService()
     {
         // Arrange
-        var expectedResponse = new StoreResponse
+        var storeData = new StoreData
         {
             Id = "store-123"
         };
 
-        var apiResponse = new ApiResponse<StoreResponse>
+        var expectedResponse = new StoreResponse
         {
-            Data = expectedResponse
+            Data = storeData
         };
 
-        _mockHttpService.Setup(x => x.GetAsync<StoreResponse>(
+        _mockHttpService.Setup(x => x.GetCustomAsync<StoreData>(
             It.IsAny<string>(), 
             It.IsAny<CancellationToken>()))
-            .ReturnsAsync(apiResponse);
+            .ReturnsAsync(expectedResponse);
 
         // Act
         var result = await _client.GetStoreAsync();
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal("store-123", result.Id);
-        _mockHttpService.Verify(x => x.GetAsync<StoreResponse>(
+        Assert.NotNull(result.Data);
+        Assert.Equal("store-123", result.Data.Id);
+        _mockHttpService.Verify(x => x.GetCustomAsync<StoreData>(
             It.IsAny<string>(), 
             It.IsAny<CancellationToken>()), Times.Once);
     }

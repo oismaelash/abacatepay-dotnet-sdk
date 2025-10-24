@@ -1,3 +1,4 @@
+using AbacatePay.Models;
 using AbacatePay.Models.Common;
 
 namespace AbacatePay.Services;
@@ -44,4 +45,13 @@ public interface IHttpService
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>API response</returns>
     Task<ApiResponse<T>> DeleteAsync<T>(string endpoint, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Send a GET request for custom API response
+    /// </summary>
+    /// <typeparam name="T">Response type</typeparam>
+    /// <param name="endpoint">API endpoint</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Custom API response</returns>
+    Task<ApiResponseCustom<T>> GetCustomAsync<T>(string endpoint, CancellationToken cancellationToken = default);
 }

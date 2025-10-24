@@ -43,3 +43,21 @@ public class PixKeyTypeValidationAttribute : ValidationAttribute
         return $"The {name} field must be one of: {string.Join(", ", ValidTypes)}";
     }
 }
+
+public class DiscountKindValidationAttribute : ValidationAttribute
+{
+    private static readonly string[] ValidTypes = { "PERCENTAGE", "FIXED" };
+
+    public override bool IsValid(object? value)
+    {
+        if (value is not string stringValue)
+            return false;
+
+        return ValidTypes.Contains(stringValue.ToString().ToUpper());
+    }
+
+    public override string FormatErrorMessage(string name)
+    {
+        return $"The {name} field must be one of: {string.Join(", ", ValidTypes)}";
+    }
+}

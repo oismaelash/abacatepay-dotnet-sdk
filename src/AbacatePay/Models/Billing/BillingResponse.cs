@@ -97,6 +97,12 @@ public class BillingData
     /// </summary>
     [JsonProperty("couponsUsed")]
     public List<string> CouponsUsed { get; set; } = new();
+
+    /// <summary>
+    /// External ID for the billing
+    /// </summary>
+    [JsonProperty("externalId")]
+    public string? ExternalId { get; set; }
 }
 
 /// <summary>
@@ -128,6 +134,18 @@ public class BillingProductData
     /// </summary>
     [JsonProperty("quantity")]
     public int Quantity { get; set; }
+
+    /// <summary>
+    /// Product quantity
+    /// </summary>
+    [JsonProperty("price")]
+    public int Price { get; set; }
+
+    /// <summary>
+    /// Product name
+    /// </summary>
+    [JsonProperty("name")]
+    public string Name { get; set; } = string.Empty;
 }
 
 /// <summary>

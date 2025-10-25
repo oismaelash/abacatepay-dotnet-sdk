@@ -23,7 +23,6 @@ public class BillingRequest
     /// </summary>
     [Required]
     [JsonProperty("methods")]
-    [EnumDataType(typeof(BillingPaymentMethod))]
     public List<string> Methods { get; set; } = new();
 
     /// <summary>
@@ -62,7 +61,7 @@ public class BillingRequest
     /// <summary>
     /// Whether to allow coupons for this billing
     /// </summary>
-    [JsonProperty("allowoCoupons")]
+    [JsonProperty("allowCoupons")]
     public bool AllowCoupons { get; set; }
 
     /// <summary>

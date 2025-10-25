@@ -1,3 +1,4 @@
+using AbacatePay.Models.Common;
 using Newtonsoft.Json;
 
 namespace AbacatePay.Models.Customer;
@@ -5,7 +6,7 @@ namespace AbacatePay.Models.Customer;
 /// <summary>
 /// Customer response from API
 /// </summary>
-public class CustomerResponse
+public class CustomerResponseData
 {
     /// <summary>
     /// Customer ID
@@ -18,6 +19,13 @@ public class CustomerResponse
     /// </summary>
     [JsonProperty("metadata")]
     public CustomerMetadata? Metadata { get; set; }
+}
+
+/// <summary>
+/// Customer response from API
+/// </summary>
+public class CustomerResponse : ApiResponse<CustomerResponseData>
+{
 }
 
 /// <summary>
@@ -48,4 +56,10 @@ public class CustomerMetadata
     /// </summary>
     [JsonProperty("taxId")]
     public string? TaxId { get; set; }
+
+    /// <summary>
+    /// Customer zip code
+    /// </summary>
+    [JsonProperty("zipCode")]
+    public string? ZipCode { get; set; }
 }

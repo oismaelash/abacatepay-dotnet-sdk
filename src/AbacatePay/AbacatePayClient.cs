@@ -75,12 +75,18 @@ public class AbacatePayClient : IDisposable
     /// <param name="request">Customer request</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Customer response</returns>
-    public async Task<CustomerResponse> CreateCustomerAsync(CustomerRequest request, CancellationToken cancellationToken = default)
+    public async Task<CustomerResponseData> CreateCustomerAsync(CustomerRequest request, CancellationToken cancellationToken = default)
     {
         RequestValidator.ValidateCustomerRequest(request);
         
-        var response = await _httpService.PostAsync<CustomerResponse>("/v1/customer/create", request, cancellationToken);
-        return response.Data ?? throw new AbacatePayException("Customer creation failed - no data returned");
+        var response = await _httpService.PostAsync<CustomerResponseData>("/v1/customer/create", request, cancellationToken);
+        
+        if (response.Error != null)
+        {
+            throw new AbacatePayException("Customer creation failed\n" + response.Error.ToString());
+        }
+        
+        return response.Data ?? throw new AbacatePayException("Customer creation failed");
     }
 
     /// <summary>

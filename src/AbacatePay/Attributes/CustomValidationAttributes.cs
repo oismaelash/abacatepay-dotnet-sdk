@@ -78,3 +78,21 @@ public class MaxRedeemsValidationAttribute : ValidationAttribute
         return $"The {name} field must be between -1 (unlimited) and from 1 to 100 inclusively";
     }
 }
+
+public class FrequencyValidationAttribute : ValidationAttribute
+{
+    private static readonly string[] ValidTypes = { "ONE_TIME", "MULTIPLE_PAYMENTS" };
+
+    public override bool IsValid(object? value)
+    {
+        if (value is not string stringValue)
+            return false;
+
+        return ValidTypes.Contains(stringValue.ToUpper());
+    }
+
+    public override string FormatErrorMessage(string name)
+    {
+        return $"The {name} field must be one of: {string.Join(", ", ValidTypes)}";
+    }
+}

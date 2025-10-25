@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using AbacatePay.Enums;
+using AbacatePay.Attributes;
 
 namespace AbacatePay.Models.Billing;
 
@@ -14,14 +15,16 @@ public class BillingRequest
     /// </summary>
     [Required]
     [JsonProperty("frequency")]
-    public BillingFrequency Frequency { get; set; }
+    [FrequencyValidation]
+    public string Frequency { get; set; } = string.Empty;
 
     /// <summary>
     /// Accepted payment methods
     /// </summary>
     [Required]
     [JsonProperty("methods")]
-    public List<BillingPaymentMethod> Methods { get; set; } = new();
+    [EnumDataType(typeof(BillingPaymentMethod))]
+    public List<string> Methods { get; set; } = new();
 
     /// <summary>
     /// Products included in the billing
@@ -55,6 +58,25 @@ public class BillingRequest
     /// </summary>
     [JsonProperty("customer")]
     public BillingCustomerData? Customer { get; set; }
+
+    /// <summary>
+    /// Whether to allow coupons for this billing
+    /// </summary>
+    [JsonProperty("allowoCoupons")]
+    public bool AllowCoupons { get; set; }
+
+    /// <summary>
+    /// Coupons to be used for this billing
+    /// </summary>
+    [JsonProperty("coupons")]
+    public List<string>? Coupons { get; set; }
+    
+
+    /// <summary>
+    /// External ID for the billing
+    /// </summary>
+    [JsonProperty("externalId")]
+    public string? ExternalId { get; set; }
 }
 
 

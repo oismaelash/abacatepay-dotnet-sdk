@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>AbacatePay.SDK</PackageId>
-    <Version>1.0.0</Version>
+    <Version>2.0.0</Version>
     <Authors>Ismael Ash</Authors>
     <Company>IAXP</Company>
     <Description>.NET SDK for AbacatePay API - A comprehensive payment solution for Brazil</Description>
@@ -19,6 +19,15 @@
     <Copyright>Copyright © AbacatePay 2025</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://docs.abacatepay.com/</PackageProjectUrl>
+    <PackageReleaseNotes>
+      - Added modular architecture
+      - Added domain-specific services
+      - Added request validation
+      - Added async/await support
+      - Added dependency injection support
+      - Added testability
+      - Added performance optimization
+    </PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

@@ -9,6 +9,7 @@ A comprehensive .NET SDK for the AbacatePay API - a Brazilian payment solution t
 ## Features
 
 - 🚀 **Easy Integration**: Simple and intuitive API design
+- 🏗️ **Modular Architecture**: Domain-specific services for better organization
 - 💳 **PIX Payments**: Create and manage PIX QR codes for instant payments
 - 👥 **Customer Management**: Create and manage customer profiles
 - 📄 **Billing System**: Handle recurring and one-time billings
@@ -18,6 +19,8 @@ A comprehensive .NET SDK for the AbacatePay API - a Brazilian payment solution t
 - 🔒 **Type Safety**: Full .NET type safety with comprehensive models
 - ✅ **Validation**: Built-in request validation
 - 🌐 **Async/Await**: Modern async programming support
+- 🔧 **Dependency Injection**: Full support for DI containers
+- 🧪 **Testability**: Easy mocking and unit testing
 - 📦 **NuGet Package**: Easy installation via NuGet
 
 ## Installation
@@ -69,7 +72,12 @@ var customerRequest = new CustomerRequest
     TaxId = "12345678901" // CPF or CNPJ
 };
 
+// Traditional way (still supported)
 var customer = await client.CreateCustomerAsync(customerRequest);
+
+// New modular way (recommended)
+var customer = await client.Customers.CreateCustomerAsync(customerRequest);
+
 Console.WriteLine($"Customer created with ID: {customer.Id}");
 ```
 
@@ -90,7 +98,12 @@ var pixRequest = new PixQrCodeRequest
     }
 };
 
+// Traditional way (still supported)
 var pixQrCode = await client.CreatePixQrCodeAsync(pixRequest);
+
+// New modular way (recommended)
+var pixQrCode = await client.PixQrCodes.CreatePixQrCodeAsync(pixRequest);
+
 Console.WriteLine($"PIX QR Code created: {pixQrCode.QrCode}");
 ```
 
@@ -118,8 +131,96 @@ var billingRequest = new BillingRequest
     AllowCoupons = true
 };
 
+// Traditional way (still supported)
 var billing = await client.CreateBillingAsync(billingRequest);
+
+// New modular way (recommended)
+var billing = await client.Billings.CreateBillingAsync(billingRequest);
+
 Console.WriteLine($"Billing created: {billing.Id}");
+```
+
+## Modular Architecture
+
+The SDK now features a modular architecture with domain-specific services for better organization and testability.
+
+### Available Services
+
+- **`ICustomerService`** - Customer management operations
+- **`IBillingService`** - Billing and payment operations  
+- **`IPixQrCodeService`** - PIX QR Code operations
+- **`ICouponService`** - Coupon management operations
+- **`IStoreService`** - Store information operations
+- **`IWithdrawService`** - Withdrawal operations
+
+### Using Domain Services
+
+```csharp
+var client = new AbacatePayClient("your-api-key");
+
+// Access domain-specific services
+var customer = await client.Customers.CreateCustomerAsync(request);
+var billing = await client.Billings.CreateBillingAsync(billingRequest);
+var pix = await client.PixQrCodes.CreatePixQrCodeAsync(pixRequest);
+var coupon = await client.Coupons.CreateCouponAsync(couponRequest);
+var store = await client.Store.GetStoreAsync();
+var withdraw = await client.Withdraws.CreateWithdrawAsync(withdrawRequest);
+```
+
+### Dependency Injection Support
+
+```csharp
+// Register services in your DI container
+services.AddScoped<ICustomerService, CustomerService>();
+services.AddScoped<IBillingService, BillingService>();
+services.AddScoped<IPixQrCodeService, PixQrCodeService>();
+services.AddScoped<ICouponService, CouponService>();
+services.AddScoped<IStoreService, StoreService>();
+services.AddScoped<IWithdrawService, WithdrawService>();
+
+// Use in your controllers
+public class PaymentController : ControllerBase
+{
+    private readonly ICustomerService _customerService;
+    private readonly IBillingService _billingService;
+
+    public PaymentController(ICustomerService customerService, IBillingService billingService)
+    {
+        _customerService = customerService;
+        _billingService = billingService;
+    }
+}
+```
+
+### Direct Service Usage
+
+```csharp
+// Use services directly without the main client
+var httpService = new HttpService(httpClient, config);
+var customerService = new CustomerService(httpService);
+var billingService = new BillingService(httpService);
+
+var customer = await customerService.CreateCustomerAsync(request);
+var billing = await billingService.CreateBillingAsync(billingRequest);
+```
+
+### Testing with Mocks
+
+```csharp
+[Test]
+public async Task CreateCustomer_ShouldReturnCustomer()
+{
+    // Arrange
+    var mockCustomerService = new Mock<ICustomerService>();
+    mockCustomerService.Setup(x => x.CreateCustomerAsync(It.IsAny<CustomerRequest>(), It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(new CustomerResponseData());
+
+    // Act
+    var result = await mockCustomerService.Object.CreateCustomerAsync(request);
+
+    // Assert
+    Assert.IsNotNull(result);
+}
 ```
 
 ## API Reference
@@ -205,6 +306,61 @@ Task<WithdrawData> GetWithdrawAsync(string withdrawId, CancellationToken cancell
 ```csharp
 Task<WithdrawData> ListWithdrawsAsync(CancellationToken cancellationToken = default)
 ```
+
+## Migration Guide
+
+### From Version 1.x to 2.x
+
+The new version is **100% backward compatible**. Your existing code will continue to work without any changes.
+
+#### Option 1: Keep Using Traditional API (No Changes Required)
+```csharp
+// Your existing code continues to work
+var client = new AbacatePayClient("api-key");
+var customer = await client.CreateCustomerAsync(request);
+var billing = await client.CreateBillingAsync(billingRequest);
+```
+
+#### Option 2: Migrate to Modular API (Recommended)
+```csharp
+// Old way
+var customer = await client.CreateCustomerAsync(request);
+
+// New way (recommended)
+var customer = await client.Customers.CreateCustomerAsync(request);
+```
+
+#### Option 3: Use Dependency Injection
+```csharp
+// Register services
+services.AddScoped<ICustomerService, CustomerService>();
+services.AddScoped<IBillingService, BillingService>();
+
+// Use in controllers
+public class PaymentController : ControllerBase
+{
+    private readonly ICustomerService _customerService;
+    
+    public PaymentController(ICustomerService customerService)
+    {
+        _customerService = customerService;
+    }
+    
+    public async Task<IActionResult> CreateCustomer(CustomerRequest request)
+    {
+        var customer = await _customerService.CreateCustomerAsync(request);
+        return Ok(customer);
+    }
+}
+```
+
+### Benefits of Migration
+
+- **Better Organization**: Domain-specific services
+- **Easier Testing**: Mock individual services
+- **Dependency Injection**: Clean architecture support
+- **Single Responsibility**: Each service has one purpose
+- **Future-Proof**: Easy to extend and maintain
 
 ## Configuration
 
@@ -340,7 +496,7 @@ sh ./build.sh
 ```
 src/
 ├── AbacatePay/
-│   ├── AbacatePayClient.cs          # Main client class
+│   ├── AbacatePayClient.cs          # Main client class (facade)
 │   ├── Models/                      # Data models
 │   │   ├── Common/                  # Common models
 │   │   ├── Customer/                # Customer models
@@ -350,7 +506,23 @@ src/
 │   │   ├── Store/                   # Store models
 │   │   └── Withdraw/                # Withdrawal models
 │   ├── Enums/                       # Enumerations
-│   ├── Services/                    # HTTP service layer
+│   ├── Services/                    # Domain services
+│   │   ├── BaseService.cs           # Base service with common logic
+│   │   ├── CustomerService.cs       # Customer operations
+│   │   ├── BillingService.cs        # Billing operations
+│   │   ├── PixQrCodeService.cs     # PIX operations
+│   │   ├── CouponService.cs         # Coupon operations
+│   │   ├── StoreService.cs          # Store operations
+│   │   ├── WithdrawService.cs       # Withdrawal operations
+│   │   ├── HttpService.cs           # HTTP communication
+│   │   └── Interfaces/              # Service interfaces
+│   │       ├── ICustomerService.cs
+│   │       ├── IBillingService.cs
+│   │       ├── IPixQrCodeService.cs
+│   │       ├── ICouponService.cs
+│   │       ├── IStoreService.cs
+│   │       ├── IWithdrawService.cs
+│   │       └── IHttpService.cs
 │   ├── Validators/                  # Request validators
 │   └── Attributes/                  # Custom validation attributes
 ```
@@ -391,6 +563,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 5. Open a Pull Request
 
 ## Changelog
+
+### Version 2.0.0
+- 🏗️ **Modular Architecture**: Domain-specific services for better organization
+- 🔧 **Dependency Injection**: Full support for DI containers
+- 🧪 **Enhanced Testability**: Easy mocking and unit testing
+- 🔄 **Backward Compatibility**: All existing code continues to work
+- 📦 **Service Interfaces**: Clean abstractions for all domain operations
+- 🎯 **Single Responsibility**: Each service handles one domain
+- ⚡ **Performance**: Optimized service layer with common base class
 
 ### Version 1.0.0
 - Initial release

@@ -20,6 +20,14 @@ public class AbacatePayClient : IDisposable
     private readonly HttpClient _httpClient;
     private bool _disposed;
 
+    // Service properties for accessing domain-specific operations
+    public ICustomerService Customers { get; }
+    public IBillingService Billings { get; }
+    public IPixQrCodeService PixQrCodes { get; }
+    public ICouponService Coupons { get; }
+    public IStoreService Store { get; }
+    public IWithdrawService Withdraws { get; }
+
     /// <summary>
     /// Initialize AbacatePay client with configuration
     /// </summary>
@@ -30,6 +38,14 @@ public class AbacatePayClient : IDisposable
         
         _httpClient = new HttpClient();
         _httpService = new HttpService(_httpClient, config);
+        
+        // Initialize domain services
+        Customers = new CustomerService(_httpService);
+        Billings = new BillingService(_httpService);
+        PixQrCodes = new PixQrCodeService(_httpService);
+        Coupons = new CouponService(_httpService);
+        Store = new StoreService(_httpService);
+        Withdraws = new WithdrawService(_httpService);
     }
 
     /// <summary>
@@ -50,6 +66,14 @@ public class AbacatePayClient : IDisposable
         
         _httpClient = new HttpClient();
         _httpService = new HttpService(_httpClient, config);
+        
+        // Initialize domain services
+        Customers = new CustomerService(_httpService);
+        Billings = new BillingService(_httpService);
+        PixQrCodes = new PixQrCodeService(_httpService);
+        Coupons = new CouponService(_httpService);
+        Store = new StoreService(_httpService);
+        Withdraws = new WithdrawService(_httpService);
     }
 
     private static void ValidateConfig(AbacatePayConfig config)
@@ -67,7 +91,7 @@ public class AbacatePayClient : IDisposable
 
 
 
-    #region Customer Methods
+    #region Customer Methods (Convenience Methods)
 
     /// <summary>
     /// Create a new customer
@@ -77,16 +101,7 @@ public class AbacatePayClient : IDisposable
     /// <returns>Customer response</returns>
     public async Task<CustomerResponseData> CreateCustomerAsync(CustomerRequest request, CancellationToken cancellationToken = default)
     {
-        RequestValidator.ValidateCustomerRequest(request);
-        
-        var response = await _httpService.PostAsync<CustomerResponseData>("/v1/customer/create", request, cancellationToken);
-        
-        if (response.Error != null)
-        {
-            throw new AbacatePayException("Customer creation failed\n" + response.Error.ToString());
-        }
-        
-        return response.Data ?? throw new AbacatePayException("Customer creation failed");
+        return await Customers.CreateCustomerAsync(request, cancellationToken);
     }
 
     /// <summary>
@@ -96,13 +111,12 @@ public class AbacatePayClient : IDisposable
     /// <returns>List of customers</returns>
     public async Task<List<CustomerResponse>> ListCustomersAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _httpService.GetAsync<List<CustomerResponse>>("/v1/customer/list", cancellationToken);
-        return response.Data ?? new List<CustomerResponse>();
+        return await Customers.ListCustomersAsync(cancellationToken);
     }
 
     #endregion
 
-    #region Coupon Methods
+    #region Coupon Methods (Convenience Methods)
 
     /// <summary>
     /// Create a new coupon
@@ -112,16 +126,7 @@ public class AbacatePayClient : IDisposable
     /// <returns>Coupon response</returns>
     public async Task<CouponData> CreateCouponAsync(CouponRequest request, CancellationToken cancellationToken = default)
     {
-        RequestValidator.ValidateCouponRequest(request);
-        
-        var response = await _httpService.PostAsync<CouponData>("/v1/coupon/create", request, cancellationToken);
-
-        if (response.Error != null)
-        {
-            throw new AbacatePayException("Coupon creation failed\n" + response.Error.ToString());
-        }
-
-        return response.Data ?? throw new AbacatePayException("Coupon creation failed - no data returned");
+        return await Coupons.CreateCouponAsync(request, cancellationToken);
     }
 
     /// <summary>
@@ -131,19 +136,12 @@ public class AbacatePayClient : IDisposable
     /// <returns>List of coupons</returns>
     public async Task<List<CouponData>> ListCouponsAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _httpService.GetAsync<List<CouponData>>("/v1/coupon/list", cancellationToken);
-        
-        if (response.Error != null)
-        {
-            throw new AbacatePayException("Coupon list failed\n" + response.Error.ToString());
-        }
-
-        return response.Data ?? throw new AbacatePayException("Coupon list failed - no data returned");
+        return await Coupons.ListCouponsAsync(cancellationToken);
     }
 
     #endregion
 
-    #region Billing Methods
+    #region Billing Methods (Convenience Methods)
 
     /// <summary>
     /// Create a new billing
@@ -153,15 +151,7 @@ public class AbacatePayClient : IDisposable
     /// <returns>Billing response</returns>
     public async Task<BillingData> CreateBillingAsync(BillingRequest request, CancellationToken cancellationToken = default)
     {
-        RequestValidator.ValidateBillingRequest(request);
-        
-        var response = await _httpService.PostAsync<BillingData>("/v1/billing/create", request, cancellationToken);
-        if (response.Error != null)
-        {
-            throw new AbacatePayException("Billing creation failed\n" + response.Error.ToString());
-        }
-
-        return response.Data ?? throw new AbacatePayException("Billing creation failed");
+        return await Billings.CreateBillingAsync(request, cancellationToken);
     }
 
     /// <summary>
@@ -172,16 +162,7 @@ public class AbacatePayClient : IDisposable
     /// <returns>Billing response</returns>
     public async Task<BillingData> GetBillingAsync(string billingId, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(billingId))
-            throw new ArgumentException("Billing ID is required", nameof(billingId));
-
-        var response = await _httpService.GetAsync<BillingData>($"/v1/billing/get?id={billingId}", cancellationToken);
-        if (response.Error != null)
-        {
-            throw new AbacatePayException("Billing not found\n" + response.Error.ToString());
-        }
-
-        return response.Data ?? throw new AbacatePayException("Billing not found - no data returned");
+        return await Billings.GetBillingAsync(billingId, cancellationToken);
     }
 
     /// <summary>
@@ -191,18 +172,12 @@ public class AbacatePayClient : IDisposable
     /// <returns>List of billings</returns>
     public async Task<List<BillingData>> ListBillingsAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _httpService.GetAsync<List<BillingData>>("/v1/billing/list", cancellationToken);
-        if (response.Error != null)
-        {
-            throw new AbacatePayException("Billing list failed\n" + response.Error.ToString());
-        }
-
-        return response.Data ?? new List<BillingData>();
+        return await Billings.ListBillingsAsync(cancellationToken);
     }
 
     #endregion
 
-    #region PIX QRCode Methods
+    #region PIX QRCode Methods (Convenience Methods)
 
     /// <summary>
     /// Create a new PIX QRCode
@@ -212,15 +187,7 @@ public class AbacatePayClient : IDisposable
     /// <returns>PIX QRCode response</returns>
     public async Task<PixQrCodeData> CreatePixQrCodeAsync(PixQrCodeRequest request, CancellationToken cancellationToken = default)
     {
-        RequestValidator.ValidatePixQrCodeRequest(request);
-        
-        var response = await _httpService.PostAsync<PixQrCodeData>("/v1/pixQrCode/create", request, cancellationToken);
-        if (response.Error != null)
-        {
-            throw new AbacatePayException("PIX QRCode creation failed\n" + response.Error.ToString());
-        }
-
-        return response.Data ?? throw new AbacatePayException("PIX QRCode creation failed - no data returned");
+        return await PixQrCodes.CreatePixQrCodeAsync(request, cancellationToken);
     }
 
     /// <summary>
@@ -231,44 +198,23 @@ public class AbacatePayClient : IDisposable
     /// <returns>PIX QRCode status response</returns>
     public async Task<PixQrCodeStatusData> CheckPixQrCodeStatusAsync(string pixQrCodeId, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(pixQrCodeId))
-            throw new ArgumentException("PIX QRCode ID is required", nameof(pixQrCodeId));
-
-        var response = await _httpService.GetAsync<PixQrCodeStatusData>($"/v1/pixQrCode/check?id={pixQrCodeId}", cancellationToken);
-        
-        if (response.Error != null)
-        {
-            throw new AbacatePayException("PIX QRCode status check failed\n" + response.Error.ToString());
-        }
-        
-        return response.Data ?? throw new AbacatePayException("PIX QRCode status check failed - no data returned");
+        return await PixQrCodes.CheckPixQrCodeStatusAsync(pixQrCodeId, cancellationToken);
     }
 
     /// <summary>
     /// Simulate PIX QRCode payment (Dev Mode only)
     /// </summary>
     /// <param name="pixQrCodeId">PIX QRCode ID</param>
-    /// <param name="request">Simulate payment request</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>PIX QRCode response</returns>
     public async Task<PixQrCodeData> SimulatePixQrCodePaymentAsync(string pixQrCodeId, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(pixQrCodeId))
-            throw new ArgumentException("PIX QRCode ID is required", nameof(pixQrCodeId));
-
-        var response = await _httpService.PostAsync<PixQrCodeData>($"/v1/pixQrCode/simulate-payment?id={pixQrCodeId}", cancellationToken);
-        
-        if (response.Error != null)
-        {
-            throw new AbacatePayException("PIX QRCode payment simulation failed\n" + response.Error.ToString());
-        }
-        
-        return response.Data ?? throw new AbacatePayException("PIX QRCode payment simulation failed - no data returned");
+        return await PixQrCodes.SimulatePixQrCodePaymentAsync(pixQrCodeId, cancellationToken);
     }
 
     #endregion
 
-    #region Store Methods
+    #region Store Methods (Convenience Methods)
 
     /// <summary>
     /// Get store details
@@ -277,19 +223,12 @@ public class AbacatePayClient : IDisposable
     /// <returns>Store response</returns>
     public async Task<StoreData> GetStoreAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _httpService.GetAsync<StoreData>("/v1/store/get", cancellationToken);
-        
-        if (response.Error != null)
-        {
-            throw new AbacatePayException("Store not found\n" + response.Error.ToString());
-        }
-
-        return response.Data ?? throw new AbacatePayException("Store not found");
+        return await Store.GetStoreAsync(cancellationToken);
     }
 
     #endregion
 
-    #region Withdraw Methods
+    #region Withdraw Methods (Convenience Methods)
 
     /// <summary>
     /// Create a new withdraw
@@ -298,15 +237,8 @@ public class AbacatePayClient : IDisposable
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Withdraw response</returns>
     public async Task<WithdrawData> CreateWithdrawAsync(WithdrawRequest request, CancellationToken cancellationToken = default)
-    {   
-        var response = await _httpService.PostAsync<WithdrawData>("/v1/withdraw/create", request, cancellationToken);
-        
-        if (response.Error != null)
-        {
-            throw new AbacatePayException("Withdraw creation failed\n" + response.Error.ToString());
-        }
-
-        return response.Data ?? throw new AbacatePayException("Withdraw creation failed - no data returned");
+    {
+        return await Withdraws.CreateWithdrawAsync(request, cancellationToken);
     }
 
     /// <summary>
@@ -317,34 +249,17 @@ public class AbacatePayClient : IDisposable
     /// <returns>Withdraw response</returns>
     public async Task<WithdrawData> GetWithdrawAsync(string withdrawId, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(withdrawId))
-            throw new ArgumentException("Withdraw ID is required", nameof(withdrawId));
-
-        var response = await _httpService.GetAsync<WithdrawData>($"/v1/withdraw/get?externalId={withdrawId}", cancellationToken);
-        
-        if (response.Error != null)
-        {
-            throw new AbacatePayException("Withdraw not found\n" + response.Error.ToString());
-        }
-        
-        return response.Data ?? throw new AbacatePayException("Withdraw not found");
+        return await Withdraws.GetWithdrawAsync(withdrawId, cancellationToken);
     }
 
     /// <summary>
     /// List all withdraws
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>List of withdraws</returns>
+    /// <returns>Withdraw response</returns>
     public async Task<WithdrawData> ListWithdrawsAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _httpService.GetAsync<WithdrawData>("/v1/withdraw/list", cancellationToken);
-        
-        if (response.Error != null)
-        {
-            throw new AbacatePayException("Withdraw list failed\n" + response.Error.ToString());
-        }
-
-        return response.Data ?? throw new AbacatePayException("Withdraw list failed - no data returned");
+        return await Withdraws.ListWithdrawsAsync(cancellationToken);
     }
 
     #endregion

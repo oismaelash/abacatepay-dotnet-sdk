@@ -103,6 +103,13 @@ public class BillingData
     /// </summary>
     [JsonProperty("externalId")]
     public string? ExternalId { get; set; }
+
+    /// <summary>
+    /// Paid amount in cents
+    /// </summary>
+    [JsonProperty("paidAmount")]
+    public int PaidAmount { get; set; }
+
 }
 
 /// <summary>

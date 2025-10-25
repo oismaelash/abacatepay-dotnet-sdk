@@ -1,32 +1,28 @@
 # AbacatePay .NET SDK
 
-[![NuGet version](https://img.shields.io/nuget/v/AbacatePay.SDK.svg)](https://www.nuget.org/packages/AbacatePay.SDK/)
-[![.NET Standard](https://img.shields.io/badge/.NET%20Standard-2.1-blue.svg)](https://docs.microsoft.com/en-us/dotnet/standard/net-standard)
+[![NuGet Version](https://img.shields.io/nuget/v/AbacatePay.SDK.svg)](https://www.nuget.org/packages/AbacatePay.SDK)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/oismaelash/abacatepay-dotnet-sdk)
+[![.NET Standard](https://img.shields.io/badge/.NET%20Standard-2.1-blue.svg)](https://docs.microsoft.com/en-us/dotnet/standard/net-standard)
 
-A comprehensive .NET SDK for integrating with the AbacatePay API - Brazil's leading payment solution supporting PIX payments.
+A comprehensive .NET SDK for the AbacatePay API - a Brazilian payment solution that supports PIX payments, billing management, customer handling, and more.
 
 ## Features
 
-- 🚀 **Complete API Coverage** - All AbacatePay endpoints implemented
-- 💳 **PIX QRCode Support** - Create and manage PIX QR codes
-- 🔒 **Secure Authentication** - Bearer token authentication
-- 📦 **Easy Integration** - Simple, intuitive API design
-- 🛡️ **Type Safety** - Full C# type definitions and validation
-- 🔄 **Async/Await Support** - Modern async programming patterns
-- 👥 **Customer Management** - Create and manage customers
-- 🎫 **Coupon System** - Create and manage discount coupons
-- 📋 **Billing System** - Create comprehensive billing with products
-- 📱 **PIX QRCode** - Generate and manage PIX QR codes with simulation
-- 🏪 **Store Management** - Get store information
-- 🏗️ **Extensible** - Easy to extend and customize
-- ✅ **Comprehensive Validation** - Built-in request validation
-- 🔧 **Cancellation Support** - Full cancellation token support
+- 🚀 **Easy Integration**: Simple and intuitive API design
+- 💳 **PIX Payments**: Create and manage PIX QR codes for instant payments
+- 👥 **Customer Management**: Create and manage customer profiles
+- 📄 **Billing System**: Handle recurring and one-time billings
+- 🎫 **Coupon System**: Create and manage discount coupons
+- 🏪 **Store Management**: Access store information and balance
+- 💰 **Withdrawals**: Manage fund withdrawals
+- 🔒 **Type Safety**: Full .NET type safety with comprehensive models
+- ✅ **Validation**: Built-in request validation
+- 🌐 **Async/Await**: Modern async programming support
+- 📦 **NuGet Package**: Easy installation via NuGet
 
 ## Installation
 
-### NuGet Package Manager
+### Package Manager
 ```bash
 Install-Package AbacatePay.SDK
 ```
@@ -41,178 +37,6 @@ dotnet add package AbacatePay.SDK
 <PackageReference Include="AbacatePay.SDK" Version="1.0.0" />
 ```
 
-## Local Development
-
-### Using the Package Locally
-
-To test the SDK locally during development, you can reference the project directly or use a local package:
-
-#### Option 1: Direct Project Reference
-
-Add a direct reference to the project in your `.csproj`:
-
-```xml
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\abacatepay-dotnet-sdk\src\AbacatePay\AbacatePay.csproj" />
-  </ItemGroup>
-</Project>
-```
-
-#### Option 2: Local Package (Recommended)
-
-1. **Generate the package locally:**
-```bash
-cd abacatepay-dotnet-sdk
-dotnet pack --configuration Release --output ./packages
-```
-
-2. **Add local NuGet source:**
-```bash
-dotnet nuget add source ./packages --name "LocalPackages"
-```
-
-3. **Install the local package:**
-```bash
-dotnet add package AbacatePay.SDK --source LocalPackages
-```
-
-#### Option 3: Using NuGet.config
-
-Create a `nuget.config` file in your project root:
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<configuration>
-  <packageSources>
-    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
-    <add key="LocalPackages" value="C:\path\to\abacatepay-dotnet-sdk\packages" />
-  </packageSources>
-</configuration>
-```
-
-### Development and Testing
-
-To facilitate development, you can use the included build script:
-
-```bash
-# Full build with tests
-./build.sh
-
-# Build only
-dotnet build
-
-# Tests only
-dotnet test
-```
-
-### Configuration for Local Testing
-
-To test the SDK locally, you'll need to configure the API credentials:
-
-#### 1. Create .env file (for integration tests)
-
-Create a `.env` file in the `tests/AbacatePay.IntegrationTests/` folder:
-
-```bash
-# Copy the example file
-cp tests/AbacatePay.IntegrationTests/env.example tests/AbacatePay.IntegrationTests/.env
-
-# Edit the .env file with your credentials
-ABACATEPAY_API_KEY=your_api_key_here
-ABACATEPAY_SANDBOX=true
-```
-
-#### 2. Configuration in your test project
-
-```csharp
-// In your test project
-var config = new AbacatePayConfig
-{
-    ApiKey = Environment.GetEnvironmentVariable("ABACATEPAY_API_KEY") ?? "your_api_key",
-    Sandbox = true, // Use sandbox for testing
-    BaseUrl = "https://api.abacatepay.com",
-    TimeoutSeconds = 30
-};
-
-var client = new AbacatePayClient(config);
-```
-
-#### 3. Test project example
-
-```xml
-<!-- In your test project -->
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\abacatepay-dotnet-sdk\src\AbacatePay\AbacatePay.csproj" />
-  </ItemGroup>
-</Project>
-```
-
-### Troubleshooting - Local Usage
-
-#### Issue: "Package not found" when using local package
-
-**Solution:**
-```bash
-# Check if the local source is configured
-dotnet nuget list source
-
-# If not listed, add it again
-dotnet nuget add source ./packages --name "LocalPackages"
-```
-
-#### Issue: "Version conflict" with local packages
-
-**Solution:**
-```bash
-# Clear NuGet cache
-dotnet nuget locals all --clear
-
-# Reinstall the package
-dotnet remove package AbacatePay.SDK
-dotnet add package AbacatePay.SDK --source LocalPackages
-```
-
-#### Issue: "Build failed" when referencing project directly
-
-**Solution:**
-```bash
-# Make sure the SDK project is built
-cd abacatepay-dotnet-sdk
-dotnet build
-
-# Then reference in your project
-cd ../your-project
-dotnet build
-```
-
-#### Issue: "API Key not found" in tests
-
-**Solution:**
-```bash
-# Check if the .env file exists and has correct credentials
-cat tests/AbacatePay.IntegrationTests/.env
-
-# If it doesn't exist, copy from example
-cp tests/AbacatePay.IntegrationTests/env.example tests/AbacatePay.IntegrationTests/.env
-```
-
 ## Quick Start
 
 ### 1. Initialize the Client
@@ -220,15 +44,15 @@ cp tests/AbacatePay.IntegrationTests/env.example tests/AbacatePay.IntegrationTes
 ```csharp
 using AbacatePay;
 
-// Using constructor with credentials
-var client = new AbacatePayClient("your_bearer_token", sandbox: true);
+// Simple initialization with API key
+var client = new AbacatePayClient("your-api-key-here");
 
-// Or using configuration object
+// Or with full configuration
 var config = new AbacatePayConfig
 {
-    ApiKey = "your_bearer_token",
-    Sandbox = true, // Set to false for production
+    ApiKey = "your-api-key-here",
     BaseUrl = "https://api.abacatepay.com",
+    Sandbox = false, // Set to true for testing
     TimeoutSeconds = 30
 };
 var client = new AbacatePayClient(config);
@@ -240,174 +64,162 @@ var client = new AbacatePayClient(config);
 var customerRequest = new CustomerRequest
 {
     Name = "João Silva",
-    Cellphone = "(11) 99999-9999",
     Email = "joao@example.com",
-    TaxId = "123.456.789-01"
+    Cellphone = "+5511999999999",
+    TaxId = "12345678901" // CPF or CNPJ
 };
 
 var customer = await client.CreateCustomerAsync(customerRequest);
-Console.WriteLine($"Customer created: {customer.Id}");
+Console.WriteLine($"Customer created with ID: {customer.Id}");
 ```
 
-### 3. List Customers
-
-```csharp
-var customers = await client.ListCustomersAsync();
-foreach (var customer in customers)
-{
-    Console.WriteLine($"Customer: {customer.Name} - {customer.Email}");
-}
-```
-
-### 4. Create a Coupon
-
-```csharp
-var couponRequest = new CouponRequest
-{
-    Data = new CouponData
-    {
-        Code = "DISCOUNT20",
-        Notes = "20% discount for new customers",
-        MaxRedeems = 100,
-        DiscountKind = DiscountKind.PERCENTAGE,
-        Discount = 20
-    }
-};
-
-var coupon = await client.CreateCouponAsync(couponRequest);
-Console.WriteLine($"Coupon created: {coupon.Id}");
-```
-
-### 5. Create a Billing
-
-```csharp
-var billingRequest = new BillingRequest
-{
-    Frequency = BillingFrequency.ONE_TIME,
-    Methods = new List<BillingPaymentMethod> { BillingPaymentMethod.PIX },
-    Products = new List<BillingProduct>
-    {
-        new BillingProduct
-        {
-            ExternalId = "prod-123",
-            Name = "Premium Plan",
-            Description = "Monthly premium subscription",
-            Quantity = 1,
-            Price = 5000 // R$ 50.00
-        }
-    },
-    ReturnUrl = "https://yourapp.com/return",
-    CompletionUrl = "https://yourapp.com/success",
-    CustomerId = "cust_123456"
-};
-
-var billing = await client.CreateBillingAsync(billingRequest);
-Console.WriteLine($"Billing created: {billing.Url}");
-```
-
-### 6. Create a PIX QRCode
+### 3. Create a PIX QR Code
 
 ```csharp
 var pixRequest = new PixQrCodeRequest
 {
-    Amount = 10000, // R$ 100.00
+    Amount = 10000, // R$ 100.00 in cents
+    Description = "Payment for services",
     ExpiresIn = 3600, // 1 hour
-    Description = "Payment for service",
     Customer = new PixQrCodeCustomer
     {
-        Name = "Maria Santos",
-        Cellphone = "(11) 88888-8888",
-        Email = "maria@example.com",
-        TaxId = "987.654.321-00"
+        Name = "João Silva",
+        Email = "joao@example.com",
+        Cellphone = "+5511999999999",
+        TaxId = "12345678901"
     }
 };
 
 var pixQrCode = await client.CreatePixQrCodeAsync(pixRequest);
-Console.WriteLine($"PIX QRCode: {pixQrCode.BrCode}");
-Console.WriteLine($"QR Code Image: {pixQrCode.BrCodeBase64}");
+Console.WriteLine($"PIX QR Code created: {pixQrCode.QrCode}");
 ```
 
-### 7. Check PIX QRCode Status
+### 4. Create a Billing
 
 ```csharp
-var status = await client.CheckPixQrCodeStatusAsync("pix_qrcode_id");
-Console.WriteLine($"PIX QRCode Status: {status.Status}");
-```
-
-### 8. Simulate PIX QRCode Payment (Dev Mode)
-
-```csharp
-var simulateRequest = new PixQrCodeSimulateRequest
+var billingRequest = new BillingRequest
 {
-    // Add simulation parameters as needed
+    Frequency = "ONE_TIME",
+    Methods = new List<string> { "PIX" },
+    Products = new List<BillingProduct>
+    {
+        new BillingProduct
+        {
+            ExternalId = "prod-001",
+            Name = "Premium Plan",
+            Description = "Monthly subscription",
+            Quantity = 1,
+            Price = 5000 // R$ 50.00 in cents
+        }
+    },
+    ReturnUrl = "https://yoursite.com/return",
+    CompletionUrl = "https://yoursite.com/success",
+    CustomerId = customer.Id,
+    AllowCoupons = true
 };
 
-var result = await client.SimulatePixQrCodePaymentAsync("pix_qrcode_id", simulateRequest);
-Console.WriteLine($"Simulation result: {result.Status}");
+var billing = await client.CreateBillingAsync(billingRequest);
+Console.WriteLine($"Billing created: {billing.Id}");
 ```
 
-### 9. Get Store Information
-
-```csharp
-var store = await client.GetStoreAsync();
-Console.WriteLine($"Store: {store.Name} (ID: {store.Id})");
-```
-
-### 10. List Billings
-
-```csharp
-var billings = await client.ListBillingsAsync();
-foreach (var billing in billings)
-{
-    Console.WriteLine($"Billing: {billing.Id} - {billing.Status}");
-}
-```
-
-### 11. List Coupons
-
-```csharp
-var coupons = await client.ListCouponsAsync();
-foreach (var coupon in coupons)
-{
-    Console.WriteLine($"Coupon: {coupon.Data.Code} - {coupon.Data.Discount}% off");
-}
-```
-
-### 12. Get Billing Details
-
-```csharp
-var billing = await client.GetBillingAsync("billing_id");
-Console.WriteLine($"Billing: {billing.Id} - Status: {billing.Status}");
-```
-
-## Available Methods
+## API Reference
 
 ### Customer Management
-- `CreateCustomerAsync()` - Create a new customer
-- `ListCustomersAsync()` - List all customers
 
-### Coupon Management  
-- `CreateCouponAsync()` - Create a new coupon
-- `ListCouponsAsync()` - List all coupons
+#### Create Customer
+```csharp
+Task<CustomerResponseData> CreateCustomerAsync(CustomerRequest request, CancellationToken cancellationToken = default)
+```
+
+#### List Customers
+```csharp
+Task<List<CustomerResponse>> ListCustomersAsync(CancellationToken cancellationToken = default)
+```
+
+### PIX QR Code Management
+
+#### Create PIX QR Code
+```csharp
+Task<PixQrCodeData> CreatePixQrCodeAsync(PixQrCodeRequest request, CancellationToken cancellationToken = default)
+```
+
+#### Check PIX Status
+```csharp
+Task<PixQrCodeStatusData> CheckPixQrCodeStatusAsync(string pixQrCodeId, CancellationToken cancellationToken = default)
+```
+
+#### Simulate Payment (Dev Mode)
+```csharp
+Task<PixQrCodeData> SimulatePixQrCodePaymentAsync(string pixQrCodeId, CancellationToken cancellationToken = default)
+```
 
 ### Billing Management
-- `CreateBillingAsync()` - Create a new billing
-- `GetBillingAsync()` - Get billing details by ID
-- `ListBillingsAsync()` - List all billings
 
-### PIX QRCode Management
-- `CreatePixQrCodeAsync()` - Create a new PIX QRCode
-- `CheckPixQrCodeStatusAsync()` - Check PIX QRCode status
-- `SimulatePixQrCodePaymentAsync()` - Simulate PIX QRCode payment (Dev Mode)
+#### Create Billing
+```csharp
+Task<BillingData> CreateBillingAsync(BillingRequest request, CancellationToken cancellationToken = default)
+```
+
+#### Get Billing
+```csharp
+Task<BillingData> GetBillingAsync(string billingId, CancellationToken cancellationToken = default)
+```
+
+#### List Billings
+```csharp
+Task<List<BillingData>> ListBillingsAsync(CancellationToken cancellationToken = default)
+```
+
+### Coupon Management
+
+#### Create Coupon
+```csharp
+Task<CouponData> CreateCouponAsync(CouponRequest request, CancellationToken cancellationToken = default)
+```
+
+#### List Coupons
+```csharp
+Task<List<CouponData>> ListCouponsAsync(CancellationToken cancellationToken = default)
+```
 
 ### Store Management
-- `GetStoreAsync()` - Get store information
 
+#### Get Store Information
+```csharp
+Task<StoreData> GetStoreAsync(CancellationToken cancellationToken = default)
+```
 
+### Withdrawal Management
+
+#### Create Withdrawal
+```csharp
+Task<WithdrawData> CreateWithdrawAsync(WithdrawRequest request, CancellationToken cancellationToken = default)
+```
+
+#### Get Withdrawal
+```csharp
+Task<WithdrawData> GetWithdrawAsync(string withdrawId, CancellationToken cancellationToken = default)
+```
+
+#### List Withdrawals
+```csharp
+Task<WithdrawData> ListWithdrawsAsync(CancellationToken cancellationToken = default)
+```
+
+## Configuration
+
+### AbacatePayConfig Properties
+
+| Property | Type | Description | Default |
+|----------|------|-------------|---------|
+| `ApiKey` | `string` | Your Bearer token from AbacatePay dashboard | Required |
+| `BaseUrl` | `string` | Base URL for the API | `"https://api.abacatepay.com"` |
+| `Sandbox` | `bool` | Whether to use sandbox mode | `false` |
+| `TimeoutSeconds` | `int` | HTTP request timeout in seconds | `30` |
 
 ## Error Handling
 
-The SDK provides comprehensive error handling with detailed error information:
+The SDK throws `AbacatePayException` for API errors:
 
 ```csharp
 try
@@ -416,10 +228,7 @@ try
 }
 catch (AbacatePayException ex)
 {
-    Console.WriteLine($"Error: {ex.Message}");
-    Console.WriteLine($"Status Code: {ex.StatusCode}");
-    Console.WriteLine($"Error Code: {ex.ErrorCode}");
-    Console.WriteLine($"Response Body: {ex.ResponseBody}");
+    Console.WriteLine($"API Error: {ex.Message}");
 }
 catch (ArgumentException ex)
 {
@@ -427,120 +236,173 @@ catch (ArgumentException ex)
 }
 ```
 
-## Configuration Options
+## Validation
+
+The SDK includes built-in validation for all request models:
+
+- **Required fields**: Automatically validated
+- **Data types**: Type safety enforced
+- **Custom validation**: Business rules validated (e.g., frequency values, price minimums)
+- **String length**: Maximum length constraints enforced
+
+## Examples
+
+### Real-World Project Example
+
+Check out a complete backend implementation using this SDK:
+- 🚀 **[AbacatePay PIX .NET Backend](https://github.com/oismaelash/abacatepay-pix-dotnet-backend)** - Full-featured backend API demonstrating SDK usage
+
+### Complete Payment Flow
 
 ```csharp
-var config = new AbacatePayConfig
-{
-    ApiKey = "your_bearer_token",
-    BaseUrl = "https://api.abacatepay.com", // Production URL
-    TimeoutSeconds = 30,
-    Sandbox = false // Set to true for testing
-};
-```
+using AbacatePay;
+using AbacatePay.Models;
 
-## Advanced Usage
-
-### Using Cancellation Tokens
-
-```csharp
-var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(30)).Token;
+// Initialize client
+var client = new AbacatePayClient("your-api-key");
 
 try
 {
-    var customer = await client.CreateCustomerAsync(customerRequest, cancellationToken);
-    Console.WriteLine($"Customer created: {customer.Id}");
-}
-catch (OperationCanceledException)
-{
-    Console.WriteLine("Operation was cancelled due to timeout");
-}
-```
-
-### Validation and Error Handling
-
-The SDK includes comprehensive validation for all request objects:
-
-```csharp
-try
-{
-    var billingRequest = new BillingRequest
+    // 1. Create PIX payment
+    var pixPayment = await client.CreatePixQrCodeAsync(new PixQrCodeRequest
     {
-        // Missing required fields will throw ArgumentException
-        Frequency = BillingFrequency.ONE_TIME,
-        Methods = new List<BillingPaymentMethod> { BillingPaymentMethod.PIX },
-        Products = new List<BillingProduct>(), // Empty list will cause validation error
-        ReturnUrl = "invalid-url", // Invalid URL format will cause validation error
-        CompletionUrl = "https://valid-url.com"
-    };
-    
-    var billing = await client.CreateBillingAsync(billingRequest);
+        Amount = 9700, // R$ 25.00
+        Description = "SDK Product",
+        Customer = {
+            Name = "Ismael Ash",
+            Cellphone = "11967435133",
+            Email = "contato@ismaelnascimento.com",
+            TsxId = "01364181045"
+        }
+    });
+
+    Console.WriteLine($"Payment created! Code: {pixPayment.BrCode}");
+
+    // 2. Check payment status
+    var status = await client.CheckPixQrCodeStatusAsync(pixPayment.Id);
+    Console.WriteLine($"Payment status: {status.Status}");
 }
-catch (ArgumentException ex)
+catch (AbacatePayException ex)
 {
-    Console.WriteLine($"Validation failed: {ex.Message}");
+    Console.WriteLine($"Payment failed: {ex.Message}");
 }
+finally
+{
+    client.Dispose();
+}
+```
+
+### Billing Flow Example
+
+```csharp
+var billingRequest = new BillingRequest
+{
+    Frequency = "ONE_TIME",
+    Methods = new List<string> { "PIX" },
+    Products = new List<BillingProduct>
+    {
+        new BillingProduct
+        {
+            ExternalId = "subscription-001",
+            Name = "Premium Subscription",
+            Description = "Monthly premium access",
+            Quantity = 1,
+            Price = 9900 // R$ 99.00
+        }
+    },
+    ReturnUrl = "https://yoursite.com/billing/return",
+    CompletionUrl = "https://yoursite.com/billing/success",
+    CustomerId = "customer-id-here", // The ID of a customer already registered in your store.
+    AllowCoupons = true,
+    Coupons = new List<string> { "WELCOME10" }
+};
+
+var billing = await client.CreateBillingAsync(billingRequest);
+Console.WriteLine($"Billing link: {billing.Url}");
+
+```
+
+## Development
+
+### Building the SDK
+
+```bash
+# Clone the repository
+git clone https://github.com/oismaelash/abacatepay-dotnet-sdk.git
+cd abacatepay-dotnet-sdk
+
+# Run the build script
+sh ./build.sh
+```
+
+### Project Structure
+
+```
+src/
+├── AbacatePay/
+│   ├── AbacatePayClient.cs          # Main client class
+│   ├── Models/                      # Data models
+│   │   ├── Common/                  # Common models
+│   │   ├── Customer/                # Customer models
+│   │   ├── Billing/                 # Billing models
+│   │   ├── PixQrCode/               # PIX QR Code models
+│   │   ├── Coupon/                  # Coupon models
+│   │   ├── Store/                   # Store models
+│   │   └── Withdraw/                # Withdrawal models
+│   ├── Enums/                       # Enumerations
+│   ├── Services/                    # HTTP service layer
+│   ├── Validators/                  # Request validators
+│   └── Attributes/                  # Custom validation attributes
 ```
 
 ## Requirements
 
-- .NET Standard 2.1 or later (.NET 6.0+ recommended)
-- Internet connection for API calls
+- .NET Standard 2.1 or higher
+- .NET 5.0 or higher
+- .NET Core 3.1 or higher
+- .NET Framework 4.8 or higher
 
 ## Dependencies
 
-- Newtonsoft.Json (13.0.3)
-- System.ComponentModel.Annotations (5.0.0)
-
-## API Reference
-
-For complete API documentation, visit: [https://docs.abacatepay.com](https://docs.abacatepay.com)
-
-### Available Endpoints
-
-- **Customers**: Create and list customers
-- **Coupons**: Create and list discount coupons  
-- **Billing**: Create, get, and list comprehensive billing with products
-- **PIX QR Codes**: Create, check status, and simulate PIX QR codes
-- **Store**: Get store information
+- `Newtonsoft.Json` (13.0.3)
+- `System.ComponentModel.Annotations` (5.0.0)
 
 ## License
 
-This SDK is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Learn More
+
+- 📺 **[YouTube Tutorial](https://youtube.com/watch?v=YOUR_VIDEO_ID)** - Watch the complete project walkthrough and SDK implementation
+- 🚀 **[Example Backend Project](https://github.com/oismaelash/abacatepay-pix-dotnet-backend)** - See the SDK in action with a real backend implementation
 
 ## Support
 
-For support and questions:
-- 📧 Email: dev@abacatepay.com
-- 📚 Documentation: [https://docs.abacatepay.com](https://docs.abacatepay.com)
-- 🐛 GitHub Issues: [https://github.com/oismaelash/abacatepay-dotnet-sdk/issues](https://github.com/oismaelash/abacatepay-dotnet-sdk/issues)
-- 💬 Discord: [Join our community](https://discord.gg/abacatepay)
+- 📚 [Documentation](https://docs.abacatepay.com/)
+- 🐛 [Issue Tracker](https://github.com/oismaelash/abacatepay-dotnet-sdk/issues)
+- 💬 [Support](https://abacatepay.com)
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-### Development Setup
-
-1. Clone the repository
-2. Install dependencies: `dotnet restore`
-3. Run tests: `dotnet test`
-4. Build the project: `dotnet build`
-
-### Code Style
-
-- Follow C# coding conventions
-- Use meaningful variable and method names
-- Add XML documentation for public APIs
-- Include unit tests for new features
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## Changelog
 
 ### Version 1.0.0
 - Initial release
-- Complete API coverage
-- PIX payment support
 - Customer management
-- Coupon system
+- PIX QR Code payments
 - Billing system
-- Webhook support
+- Coupon management
+- Store information
+- Withdrawal management
+- Comprehensive validation
+- Async/await support
+
+---
+
+Made with ❤️ by [Ismael Ash](https://github.com/oismaelash) for the Brazilian fintech ecosystem.
